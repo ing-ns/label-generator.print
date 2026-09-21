@@ -204,7 +204,7 @@
       transition: background-color .15s ease, color .15s ease, border-color .15s ease;
     }
 
-    .seg-emoji { font-size: 15px; line-height: 1; }
+    .seg-btn svg.ico { width: 17px; height: 17px; flex: none; }
 
     .seg-btn:hover:not(.active-mode) {
       border-color: var(--accent);
@@ -217,6 +217,18 @@
       color: #ffffff;
       font-weight: 600;
       box-shadow: 0 1px 3px rgba(20, 40, 45, .2);
+    }
+
+    .seg-btn:focus-visible,
+    .btn-generate:focus-visible,
+    .btn-print:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    @media (max-width: 519px) {
+      .segmented { grid-template-columns: repeat(2, 1fr); }
+      .seg-btn { min-height: 42px; }
     }
 
     .mode-hint {
@@ -318,88 +330,114 @@
     }
 
     .btn-print {
-      min-width: 90px;
+      min-width: 108px;
       justify-content: center;
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      height: 32px;
-      padding: 0 12px;
+      gap: 7px;
+      height: 36px;
+      padding: 0 16px;
       font: inherit;
-      font-size: 14px;
-      font-weight: 500;
-      color: var(--accent-strong);
-      background: transparent;
-      border: 1px solid var(--line);
-      border-radius: 10px;
+      font-size: 14.5px;
+      font-weight: 600;
+      color: var(--on-accent);
+      background: var(--accent);
+      border: 0;
+      border-radius: 11px;
       cursor: pointer;
-      transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+      transition: background-color .15s ease, transform .05s ease;
     }
 
-    .btn-print svg.ico { width: 16px; height: 16px; }
+    .btn-print svg.ico { width: 17px; height: 17px; }
 
-    .btn-print:hover {
-      background: var(--accent-soft);
-      border-color: var(--accent);
+    .btn-print:hover:not(:disabled) { background: var(--accent-strong); }
+    .btn-print:active:not(:disabled) { transform: translateY(1px); }
+
+    .btn-print:disabled {
+      color: #7d8b90;
+      background: var(--track);
+      cursor: default;
+    }
+
+    .head-note {
+      font-size: 12.5px;
+      font-weight: 400;
+      color: var(--muted);
+      margin-left: 6px;
     }
 
     .stage {
       background: var(--stage);
       border-radius: 12px;
-      padding: 14px 16px;
+      padding: 16px;
       display: flex;
       justify-content: center;
       align-items: center;
-      min-height: 110px;
     }
 
-    /* ---------- หน้าจอพรีวิว ---------- */
+    /* กรอบ label 30x40 มม. ขยาย --k เท่า เพื่อให้เห็นชัดบนจอ (สัดส่วนจริง) */
+    .label-frame {
+      --k: 1.6;
+      flex: none;
+      width: calc(30mm * var(--k));
+      height: calc(40mm * var(--k));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--paper);
+      border: 1px solid var(--paper-line);
+      border-radius: 4px;
+      box-shadow: var(--shadow-paper);
+    }
+
+    .label-frame.is-empty {
+      background: transparent;
+      border: 1.5px dashed var(--dash);
+      box-shadow: none;
+    }
+
+    .label-frame.is-over {
+      outline: 2px solid #e2a04a;
+      outline-offset: 2px;
+    }
+
+    /* ---------- หน้าจอพรีวิว (ใช้ค่าเดียวกับตอนพิมพ์ ยกเว้นคูณ --k) ---------- */
     .label-preview {
       --font-scale: 1;
       display: inline-block;
       width: fit-content;
+      max-width: 100%;
       text-align: left;
       white-space: pre-line;
       word-break: break-word;
       font-family: 'Angsana New', 'AngsanaUPC', 'Sarabun', sans-serif;
-      font-size: calc(24pt * var(--font-scale, 1)); /* ปรับเฉพาะขนาดตัวอักษร */
+      font-size: calc(24pt * var(--font-scale, 1) * var(--k, 1));
       font-style: normal;
       font-weight: 700;
       letter-spacing: .01em;
       color: var(--paper-ink);
-      background: var(--paper);
-      border: 1px solid var(--paper-line);
-      border-radius: 8px;
-      box-shadow: var(--shadow-paper);
-      padding: 12px 24px;
       user-select: all;
     }
 
-    /* ระยะห่างบรรทัดคงไว้เท่าเดิมอย่างถูกต้อง ไม่เปลี่ยนตามเปอร์เซ็นต์ */
-    #labelPreview[data-lines="1"] { line-height: 28pt; }
-    #labelPreview[data-lines="2"] { line-height: 22pt; }
-    #labelPreview[data-lines="3"] { line-height: 19pt; }
-    #labelPreview[data-lines="4"] { line-height: 17pt; }
-    #labelPreview[data-lines="5"] { line-height: 15pt; }
-    #labelPreview[data-lines="6"] { line-height: 13.5pt; }
-    #labelPreview[data-lines="7"] { line-height: 12pt; }
+    #labelPreview[data-lines="1"],
+    #labelPreview[data-lines="2"],
+    #labelPreview[data-lines="3"] { line-height: 1.2; }
+    #labelPreview[data-lines="4"] { line-height: 0.9; }
+    #labelPreview[data-lines="5"] { line-height: 0.77; }
+    #labelPreview[data-lines="6"] { line-height: 0.67; }
+    #labelPreview[data-lines="7"] { line-height: 0.64; }
 
     .label-preview.is-empty {
-      display: block;
       width: auto;
+      padding: 0 14px;
       font-family: 'Sarabun', sans-serif;
-      font-size: 14px;
+      font-size: 13.5px;
       font-weight: 400;
-      font-style: normal;
       letter-spacing: 0;
+      line-height: 1.5;
       text-align: center;
       color: var(--muted);
-      background: transparent;
-      border: 1.5px dashed var(--dash);
-      box-shadow: none;
       user-select: none;
-      min-width: 0;
-      padding: 20px 20px;
     }
 
     .raw-input-display {
@@ -414,6 +452,49 @@
 
     .raw-input-display.show { display: block; }
     .raw-input-display span { font-weight: 400; margin-left: 2px; }
+
+    /* ---------- คำเตือน ---------- */
+    .fit-warn[hidden], .font-note[hidden] { display: none; }
+
+    .fit-warn {
+      margin-top: 10px;
+      padding: 8px 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      line-height: 1.4;
+      color: #7a4300;
+      background: #fff6e8;
+      border: 1px solid #f0d6a8;
+      border-radius: 10px;
+    }
+
+    .fit-warn svg.ico { width: 16px; height: 16px; flex: none; }
+
+    .fit-btn {
+      margin-left: auto;
+      flex: none;
+      font: inherit;
+      font-weight: 600;
+      color: inherit;
+      background: none;
+      border: 0;
+      padding: 2px 4px;
+      border-radius: 6px;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      cursor: pointer;
+    }
+
+    .fit-btn:focus-visible { outline: 2px solid #7a4300; outline-offset: 2px; }
+
+    .font-note {
+      margin-top: 8px;
+      font-size: 12px;
+      line-height: 1.4;
+      color: #7a4300;
+    }
 
     /* ========================================================= */
     /*   การตั้งค่าพิมพ์: 3x4 ซม. Angsana New จัดกึ่งกลางสมบูรณ์   */
@@ -440,11 +521,13 @@
       .card:first-of-type,
       .result-head,
       .scale-panel,
+      .fit-warn,
+      .font-note,
       .raw-input-display {
         display: none !important;
       }
 
-      .app, .card, .stage {
+      .app, .card, .stage, .label-frame {
         display: flex !important;
         justify-content: center !important;
         align-items: center !important;
@@ -457,12 +540,21 @@
         box-shadow: none !important;
       }
 
+      .label-frame {
+        aspect-ratio: auto !important;
+        overflow: visible !important;
+        outline: none !important;
+        border-radius: 0 !important;
+      }
+
+      #labelPreview.is-empty { display: none !important; }
+
       #labelPreview {
         display: inline-block !important;
         width: fit-content !important;
         text-align: left !important;
 
-        font-family: 'Angsana New', 'AngsanaUPC', sans-serif !important;
+        font-family: 'Angsana New', 'AngsanaUPC', 'Sarabun', sans-serif !important;
         font-size: calc(24pt * var(--font-scale, 1)) !important; /* ย่อขนาดตัวอักษรลงขณะสั่งพิมพ์ */
         font-style: normal !important;
         font-weight: bold !important;
@@ -504,10 +596,10 @@
     <section class="card" aria-label="ป้อนข้อมูล">
       <span class="field-label" id="modeLabel">ประเภทหนังสือ</span>
       <div class="segmented" role="radiogroup" aria-labelledby="modeLabel">
-        <button type="button" class="seg-btn active-mode" data-mode="normal" role="radio" aria-checked="true"  onclick="setMode('normal')"><span class="seg-emoji" aria-hidden="true">📖</span><span>ทั่วไป / CRE</span></button>
-        <button type="button" class="seg-btn" data-mode="rare"   role="radio" aria-checked="false" tabindex="-1" onclick="setMode('rare')"><span class="seg-emoji" aria-hidden="true">📜</span><span>หายาก</span></button>
-        <button type="button" class="seg-btn" data-mode="ref"    role="radio" aria-checked="false" tabindex="-1" onclick="setMode('ref')"><span class="seg-emoji" aria-hidden="true">🔍</span><span>อ้างอิง</span></button>
-        <button type="button" class="seg-btn" data-mode="thesis" role="radio" aria-checked="false" tabindex="-1" onclick="setMode('thesis')"><span class="seg-emoji" aria-hidden="true">🎓</span><span>วพ</span></button>
+        <button type="button" class="seg-btn active-mode" data-mode="normal" role="radio" aria-checked="true"  onclick="setMode('normal')"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6.5C10.5 5.3 8.3 4.7 5 4.7v12.6c3.3 0 5.5.6 7 1.8 1.5-1.2 3.7-1.8 7-1.8V4.7c-3.3 0-5.5.6-7 1.8zM12 6.5v12.6"/></svg><span>ทั่วไป / CRE</span></button>
+        <button type="button" class="seg-btn" data-mode="rare"   role="radio" aria-checked="false" tabindex="-1" onclick="setMode('rare')"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12l4 6-10 13L2 9z"/><path d="M11 3 8 9l4 13 4-13-3-6"/><path d="M2 9h20"/></svg><span>หายาก</span></button>
+        <button type="button" class="seg-btn" data-mode="ref"    role="radio" aria-checked="false" tabindex="-1" onclick="setMode('ref')"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg><span>อ้างอิง</span></button>
+        <button type="button" class="seg-btn" data-mode="thesis" role="radio" aria-checked="false" tabindex="-1" onclick="setMode('thesis')"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg><span>วพ</span></button>
       </div>
       <p class="mode-hint" id="modeHint">รวมถึงนิยาย / การ์ตูน / DOC</p>
 
@@ -530,9 +622,9 @@
 
     <section class="card" aria-label="ผลลัพธ์">
       <div class="result-head">
-        <h2>ผลลัพธ์</h2>
+        <h2>ผลลัพธ์<span class="head-note">label 3 × 4 ซม.</span></h2>
         <div class="btn-actions">
-          <button type="button" class="btn-print" onclick="window.print()">
+          <button type="button" class="btn-print" id="printBtn" onclick="window.print()" disabled>
             <svg class="ico" viewBox="0 0 24 24" aria-hidden="true">
               <path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
               <rect x="6" y="14" width="12" height="8"/>
@@ -543,10 +635,18 @@
       </div>
 
       <div class="stage">
-        <div id="labelPreview" class="label-preview is-empty">ผลลัพธ์จะแสดงที่นี่</div>
+        <div class="label-frame is-empty" id="labelFrame">
+          <div id="labelPreview" class="label-preview is-empty">ผลลัพธ์จะแสดงที่นี่</div>
+        </div>
       </div>
 
       <div id="rawInputDisplay" class="raw-input-display"></div>
+
+      <div class="fit-warn" id="fitWarn" role="status" hidden>
+        <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4 2.5 20h19z"/><path d="M12 10v4.5M12 17.4v.1"/></svg>
+        <span id="fitWarnText">ข้อความเกินขอบ label</span>
+        <button type="button" class="fit-btn" id="fitBtn" onclick="fitFontScale()">ลดให้พอดี</button>
+      </div>
 
       <div class="scale-panel" role="group" aria-label="ขนาดตัวอักษร">
         <span class="scale-title">ขนาดตัวอักษร</span>
@@ -559,6 +659,8 @@
           <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
         </button>
       </div>
+
+      <p class="font-note" id="fontNote" hidden>เครื่องนี้ไม่มีฟอนต์ Angsana New จึงใช้ Sarabun แทน ระยะบรรทัดและความกว้างอาจต่างจากที่ออกแบบไว้</p>
     </section>
 
   </main>
@@ -588,6 +690,106 @@
       if (persist) {
         try { localStorage.setItem(SCALE_KEY, String(pct)); } catch (e) {}
       }
+
+      checkFit();
+    }
+
+    /* ---------- ตรวจว่าข้อความล้นกรอบ label หรือไม่ ---------- */
+    function labelFits() {
+      const frame = document.getElementById('labelFrame');
+      const el = document.getElementById('labelPreview');
+      const st = el.style;
+
+      // วัดขนาดตามธรรมชาติ (ไม่ตัดบรรทัด)
+      st.whiteSpace = 'pre';
+      st.wordBreak = 'normal';
+      st.width = 'max-content';
+      st.maxWidth = 'none';
+      const r = el.getBoundingClientRect();
+      st.whiteSpace = st.wordBreak = st.width = st.maxWidth = '';
+
+      const inset = frame.clientWidth / 60; // เผื่อขอบ 0.5 มม.
+      return r.width  <= frame.clientWidth  - inset * 2 + 0.5 &&
+             r.height <= frame.clientHeight - inset * 2 + 0.5;
+    }
+
+    function checkFit() {
+      const frame = document.getElementById('labelFrame');
+      const el = document.getElementById('labelPreview');
+      const warn = document.getElementById('fitWarn');
+      if (!frame || !el || !warn) return;
+
+      if (el.classList.contains('is-empty')) {
+        frame.classList.remove('is-over');
+        warn.hidden = true;
+        return;
+      }
+
+      const fits = labelFits();
+      frame.classList.toggle('is-over', !fits);
+      warn.hidden = fits;
+      if (!fits) {
+        const atMin = currentScale <= SCALE_MIN;
+        document.getElementById('fitWarnText').textContent =
+          atMin ? 'ข้อความยังเกินขอบ label แม้ใช้ขนาดเล็กสุด' : 'ข้อความเกินขอบ label';
+        document.getElementById('fitBtn').hidden = atMin;
+      }
+    }
+
+    function fitFontScale() {
+      let p = currentScale;
+      while (p > SCALE_MIN) {
+        p = Math.max(SCALE_MIN, p - 5);
+        updateFontScale(p, false);
+        if (labelFits()) break;
+      }
+      updateFontScale(currentScale); // บันทึกค่าสุดท้าย
+    }
+
+    /* ---------- ตรวจว่ามีฟอนต์ Angsana New ในเครื่องหรือไม่ ---------- */
+    function hasLocalFont(name) {
+      const ctx = document.createElement('canvas').getContext('2d');
+      const sample = 'ทดสอบ Ra QA76.73 1234';
+      return ['monospace', 'serif', 'sans-serif'].some(base => {
+        ctx.font = '72px ' + base;
+        const baseW = ctx.measureText(sample).width;
+        ctx.font = '72px "' + name + '", ' + base;
+        return ctx.measureText(sample).width !== baseW;
+      });
+    }
+
+    function detectPrintFont() {
+      const ok = hasLocalFont('Angsana New') || hasLocalFont('AngsanaUPC');
+      document.getElementById('fontNote').hidden = ok;
+    }
+
+    /* ---------- เลือกประเภทหนังสือด้วยคีย์บอร์ด (ลูกศร / Home / End) ---------- */
+    function initSegmented() {
+      const group = document.querySelector('.segmented');
+      const input = document.getElementById('callNumberInput');
+      const fine = window.matchMedia('(pointer: fine)');
+
+      group.addEventListener('keydown', e => {
+        const btns = Array.from(group.querySelectorAll('.seg-btn'));
+        const i = btns.indexOf(document.activeElement);
+        if (i < 0) return;
+
+        let next;
+        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') next = (i + 1) % btns.length;
+        else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') next = (i - 1 + btns.length) % btns.length;
+        else if (e.key === 'Home') next = 0;
+        else if (e.key === 'End') next = btns.length - 1;
+        else return;
+
+        e.preventDefault();
+        btns[next].focus();
+        setMode(btns[next].dataset.mode);
+      });
+
+      // คลิกด้วยเมาส์แล้วกลับไปที่ช่องกรอก (ไม่ทำบนจอสัมผัส เพื่อไม่ให้คีย์บอร์ดเด้ง)
+      group.addEventListener('click', e => {
+        if (e.detail > 0 && fine.matches) input.focus();
+      });
     }
 
     function nudgeFontScale(delta) {
@@ -639,13 +841,16 @@
       const el = document.getElementById('labelPreview');
       el.innerText = text;
       el.classList.toggle('is-empty', isEmpty);
+      document.getElementById('labelFrame').classList.toggle('is-empty', isEmpty);
+      document.getElementById('printBtn').disabled = isEmpty;
 
       if (!isEmpty) {
-        const lineCount = text.split('\n').length;
-        el.setAttribute('data-lines', lineCount);
+        el.setAttribute('data-lines', text.split('\n').length);
       } else {
         el.removeAttribute('data-lines');
       }
+
+      checkFit();
     }
 
     function hasThai(str) {
@@ -854,6 +1059,11 @@
     }
 
     initFontScale();
+    initSegmented();
+    detectPrintFont();
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(() => { detectPrintFont(); checkFit(); });
+    }
   </script>
 </body>
 </html>
