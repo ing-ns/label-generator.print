@@ -110,7 +110,7 @@
       margin-bottom: 6px;
     }
 
-    /* ---------- Font scale (เล็ก เงียบ ใช้นานๆ ครั้ง) ---------- */
+    /* ---------- Font scale ---------- */
     .scale-panel {
       margin-top: 8px;
       display: flex;
@@ -359,13 +359,6 @@
       cursor: default;
     }
 
-    .head-note {
-      font-size: 12.5px;
-      font-weight: 400;
-      color: var(--muted);
-      margin-left: 6px;
-    }
-
     .stage {
       background: var(--stage);
       border-radius: 12px;
@@ -375,7 +368,7 @@
       align-items: center;
     }
 
-    /* กรอบ label 30x40 มม. ขยาย --k เท่า เพื่อให้เห็นชัดบนจอ (สัดส่วนจริง) */
+    /* กรอบ label 30x40 มม. ขยาย --k เท่า เพื่อให้เห็นชัดบนจอ */
     .label-frame {
       --k: 1.6;
       flex: none;
@@ -401,7 +394,7 @@
       outline-offset: 2px;
     }
 
-    /* ---------- หน้าจอพรีวิว (ใช้ค่าเดียวกับตอนพิมพ์ ยกเว้นคูณ --k) ---------- */
+    /* ---------- หน้าจอพรีวิว ---------- */
     .label-preview {
       --font-scale: 1;
       display: inline-block;
@@ -555,7 +548,7 @@
         text-align: left !important;
 
         font-family: 'Angsana New', 'AngsanaUPC', 'Sarabun', sans-serif !important;
-        font-size: calc(24pt * var(--font-scale, 1)) !important; /* ย่อขนาดตัวอักษรลงขณะสั่งพิมพ์ */
+        font-size: calc(24pt * var(--font-scale, 1)) !important;
         font-style: normal !important;
         font-weight: bold !important;
         color: #000000 !important;
@@ -572,7 +565,6 @@
         break-inside: avoid !important;
       }
 
-      /* ระยะห่างบรรทัดขณะสั่งพิมพ์ คงค่าเดิมไว้ตรงกับไฟล์ PDF ที่สวยงาม */
       #labelPreview[data-lines="1"] { line-height: 1.2 !important; }
       #labelPreview[data-lines="2"] { line-height: 1.2 !important; }
       #labelPreview[data-lines="3"] { line-height: 1.2 !important; }
@@ -596,10 +588,10 @@
     <section class="card" aria-label="ป้อนข้อมูล">
       <span class="field-label" id="modeLabel">ประเภทหนังสือ</span>
       <div class="segmented" role="radiogroup" aria-labelledby="modeLabel">
-        <button type="button" class="seg-btn active-mode" data-mode="normal" role="radio" aria-checked="true"  onclick="setMode('normal')"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6.5C10.5 5.3 8.3 4.7 5 4.7v12.6c3.3 0 5.5.6 7 1.8 1.5-1.2 3.7-1.8 7-1.8V4.7c-3.3 0-5.5.6-7 1.8zM12 6.5v12.6"/></svg><span>ทั่วไป / CRE</span></button>
-        <button type="button" class="seg-btn" data-mode="rare"   role="radio" aria-checked="false" tabindex="-1" onclick="setMode('rare')"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12l4 6-10 13L2 9z"/><path d="M11 3 8 9l4 13 4-13-3-6"/><path d="M2 9h20"/></svg><span>หายาก</span></button>
-        <button type="button" class="seg-btn" data-mode="ref"    role="radio" aria-checked="false" tabindex="-1" onclick="setMode('ref')"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg><span>อ้างอิง</span></button>
-        <button type="button" class="seg-btn" data-mode="thesis" role="radio" aria-checked="false" tabindex="-1" onclick="setMode('thesis')"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg><span>วพ</span></button>
+        <button type="button" class="seg-btn active-mode" data-mode="normal" role="radio" aria-checked="true" tabindex="0" onclick="setMode('normal', true)"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6.5C10.5 5.3 8.3 4.7 5 4.7v12.6c3.3 0 5.5.6 7 1.8 1.5-1.2 3.7-1.8 7-1.8V4.7c-3.3 0-5.5.6-7 1.8zM12 6.5v12.6"/></svg><span>ทั่วไป / CRE</span></button>
+        <button type="button" class="seg-btn" data-mode="rare" role="radio" aria-checked="false" tabindex="-1" onclick="setMode('rare', true)"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12l4 6-10 13L2 9z"/><path d="M11 3 8 9l4 13 4-13-3-6"/><path d="M2 9h20"/></svg><span>หายาก</span></button>
+        <button type="button" class="seg-btn" data-mode="ref" role="radio" aria-checked="false" tabindex="-1" onclick="setMode('ref', true)"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg><span>อ้างอิง</span></button>
+        <button type="button" class="seg-btn" data-mode="thesis" role="radio" aria-checked="false" tabindex="-1" onclick="setMode('thesis', true)"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg><span>วพ</span></button>
       </div>
       <p class="mode-hint" id="modeHint">รวมถึงนิยาย / การ์ตูน / DOC</p>
 
@@ -616,13 +608,13 @@
           >
           <button type="button" class="btn-generate" onclick="generateLabel()">สร้าง</button>
         </div>
-        <p class="key-hint">กด <kbd>Enter</kbd> เพื่อสร้าง</p>
+        <p class="key-hint">กด <kbd>Enter</kbd> เพื่อสร้าง | <kbd>Alt</kbd> + <kbd>1-4</kbd> เปลี่ยนประเภทหนังสือ</p>
       </div>
     </section>
 
     <section class="card" aria-label="ผลลัพธ์">
       <div class="result-head">
-        <h2>ผลลัพธ์<span class="head-note">label 3 × 4 ซม.</span></h2>
+        <h2>ผลลัพธ์</h2>
         <div class="btn-actions">
           <button type="button" class="btn-print" id="printBtn" onclick="window.print()" disabled>
             <svg class="ico" viewBox="0 0 24 24" aria-hidden="true">
@@ -673,6 +665,8 @@
     const SCALE_KEY = 'labelFontScalePct';
     let currentScale = 100;
 
+    const MODES = ['normal', 'rare', 'ref', 'thesis'];
+
     function updateFontScale(percentVal, persist = true) {
       let pct = Math.round(parseFloat(percentVal));
       if (!isFinite(pct)) pct = 100;
@@ -700,7 +694,6 @@
       const el = document.getElementById('labelPreview');
       const st = el.style;
 
-      // วัดขนาดตามธรรมชาติ (ไม่ตัดบรรทัด)
       st.whiteSpace = 'pre';
       st.wordBreak = 'normal';
       st.width = 'max-content';
@@ -708,7 +701,7 @@
       const r = el.getBoundingClientRect();
       st.whiteSpace = st.wordBreak = st.width = st.maxWidth = '';
 
-      const inset = frame.clientWidth / 60; // เผื่อขอบ 0.5 มม.
+      const inset = frame.clientWidth / 60;
       return r.width  <= frame.clientWidth  - inset * 2 + 0.5 &&
              r.height <= frame.clientHeight - inset * 2 + 0.5;
     }
@@ -743,7 +736,7 @@
         updateFontScale(p, false);
         if (labelFits()) break;
       }
-      updateFontScale(currentScale); // บันทึกค่าสุดท้าย
+      updateFontScale(currentScale);
     }
 
     /* ---------- ตรวจว่ามีฟอนต์ Angsana New ในเครื่องหรือไม่ ---------- */
@@ -763,32 +756,31 @@
       document.getElementById('fontNote').hidden = ok;
     }
 
-    /* ---------- เลือกประเภทหนังสือด้วยคีย์บอร์ด (ลูกศร / Home / End) ---------- */
+    /* ---------- เลือกประเภทหนังสือด้วยคีย์บอร์ด ---------- */
     function initSegmented() {
       const group = document.querySelector('.segmented');
       const input = document.getElementById('callNumberInput');
-      const fine = window.matchMedia('(pointer: fine)');
 
       group.addEventListener('keydown', e => {
         const btns = Array.from(group.querySelectorAll('.seg-btn'));
-        const i = btns.indexOf(document.activeElement);
-        if (i < 0) return;
+        const activeIdx = btns.findIndex(b => b.dataset.mode === currentMode);
+        let next = activeIdx;
 
-        let next;
-        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') next = (i + 1) % btns.length;
-        else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') next = (i - 1 + btns.length) % btns.length;
-        else if (e.key === 'Home') next = 0;
-        else if (e.key === 'End') next = btns.length - 1;
-        else return;
+        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+          next = (activeIdx + 1) % btns.length;
+        } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+          next = (activeIdx - 1 + btns.length) % btns.length;
+        } else if (e.key === 'Home') {
+          next = 0;
+        } else if (e.key === 'End') {
+          next = btns.length - 1;
+        } else {
+          return;
+        }
 
         e.preventDefault();
+        setMode(btns[next].dataset.mode, true);
         btns[next].focus();
-        setMode(btns[next].dataset.mode);
-      });
-
-      // คลิกด้วยเมาส์แล้วกลับไปที่ช่องกรอก (ไม่ทำบนจอสัมผัส เพื่อไม่ให้คีย์บอร์ดเด้ง)
-      group.addEventListener('click', e => {
-        if (e.detail > 0 && fine.matches) input.focus();
       });
     }
 
@@ -821,7 +813,7 @@
       thesis: 'เติม วพ หรือ T'
     };
 
-    function setMode(mode) {
+    function setMode(mode, returnFocusToInput = false) {
       currentMode = mode;
       document.querySelectorAll('.seg-btn').forEach(btn => {
         const on = btn.dataset.mode === mode;
@@ -831,9 +823,13 @@
       });
       document.getElementById('modeHint').textContent = MODE_HINTS[mode] || '';
 
-      const input = document.getElementById('callNumberInput').value;
-      if (input.trim() || lastRawInput) {
+      const inputEl = document.getElementById('callNumberInput');
+      if (inputEl.value.trim() || lastRawInput) {
         generateLabel(true);
+      }
+
+      if (returnFocusToInput && inputEl) {
+        inputEl.focus();
       }
     }
 
@@ -1055,6 +1051,12 @@
       if (event.key === 'Enter') {
         event.preventDefault();
         generateLabel();
+      } else if (event.altKey && ['1', '2', '3', '4'].includes(event.key)) {
+        event.preventDefault();
+        const idx = parseInt(event.key, 10) - 1;
+        if (MODES[idx]) {
+          setMode(MODES[idx], true);
+        }
       }
     }
 
