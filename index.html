@@ -1001,12 +1001,12 @@
         }
 
         const monthRegexStr = `(?:ม\\.ค\\.?|ก\\.พ\\.?|มี\\.ค\\.?|เม\\.ย\\.?|พ\\.ค\\.?|มิ\\.ย\\.?|ก\\.ค\\.?|ส\\.ค\\.?|ก\\.ย\\.?|ต\\.ค\\.?|พ\\.ย\\.?|ธ\\.ค\\.?|มกราคม|กุมภาพันธ์|มีนาคม|เมษายน|พฤษภาคม|มิถุนายน|กรกฎาคม|สิงหาคม|กันยายน|ตุลาคม|พฤศจิกายน|ธันวาคม|Jan[a-zA-Z]*\\.?|Feb[a-zA-Z]*\\.?|Mar[a-zA-Z]*\\.?|Apr[a-zA-Z]*\\.?|May[a-zA-Z]*\\.?|Jun[a-zA-Z]*\\.?|Jul[a-zA-Z]*\\.?|Aug[a-zA-Z]*\\.?|Sep[a-zA-Z]*\\.?|Sept[a-zA-Z]*\\.?|Oct[a-zA-Z]*\\.?|Nov[a-zA-Z]*\\.?|Dec[a-zA-Z]*\\.?)`;
-        const yearRegexStr = `(?:[12]\\d{3})`;
+        const yearRegexStr = `(?:[12]\\d{3}(?:-(?:[12]\\d{3}|\\d{2}))?(?:[a-zA-Z\\u0E00-\\u0E7F](?![a-zA-Z\\u0E00-\\u0E7F]))?)`;
 
         const patternMonthYearRange = new RegExp(monthRegexStr + '\\s*' + yearRegexStr + '\\s*-\\s*' + monthRegexStr + '\\s*' + yearRegexStr, 'i');
         const patternMonthRangeYear = new RegExp(monthRegexStr + '\\s*-\\s*' + monthRegexStr + '\\s*' + yearRegexStr, 'i');
         const patternMonthYear = new RegExp(monthRegexStr + '\\s*' + yearRegexStr, 'i');
-        const yearPattern = /\b[12]\d{3}(?:-(?:[12]\d{3}|\d{2}))?\b/;
+        const yearPattern = /(?<!\d)[12]\d{3}(?:-(?:[12]\d{3}|\d{2}))?(?:[a-zA-Z\u0E00-\u0E7F](?![a-zA-Z\u0E00-\u0E7F]))?(?!\d)/;
 
         const yearMatch = str.match(patternMonthYearRange) ||
                           str.match(patternMonthRangeYear) ||
