@@ -423,7 +423,10 @@
       * { transition: none !important; animation: none !important; }
     }
     @media print {
-       /* ซ่อนองค์ประกอบอื่นๆ บนหน้าเว็บเมื่อสั่งพิมพ์ */
+      @page {
+        size: 30mm 40mm;
+        margin: 0;
+      }
       body * {
         visibility: hidden;
       }
