@@ -608,7 +608,7 @@
           >
           <button type="button" class="btn-generate" onclick="generateLabel()">สร้าง</button>
         </div>
-        <p class="key-hint">กด <kbd>Enter</kbd> เพื่อสร้าง | <kbd>Alt</kbd> + <kbd>1-4</kbd> หรือ <kbd>Alt</kbd> + <kbd>ลูกศร</kbd> เปลี่ยนประเภทหนังสือ</p>
+        <p class="key-hint">กด <kbd>Enter</kbd> เพื่อสร้าง | <kbd>Alt</kbd> + <kbd>1-4</kbd> หรือ <kbd>Alt</kbd> + <kbd>←</kbd> <kbd>→</kbd> เปลี่ยนประเภทหนังสือ</p>
       </div>
     </section>
 
@@ -756,11 +756,11 @@
       document.getElementById('fontNote').hidden = ok;
     }
 
-    /* ---------- เลือกประเภทหนังสือด้วยคีย์บอร์ด ---------- */
-    function initSegmented() {
+    /* ---------- ระบบคีย์บอร์ดแบบครอบคลุมทั่วทั้งหน้าจอ ---------- */
+    function initKeyboardShortcuts() {
       const group = document.querySelector('.segmented');
-      const input = document.getElementById('callNumberInput');
 
+      // 1. รองรับการใช้ลูกศรเมื่อโฟกัสอยู่ที่ปุ่มประเภทหนังสือ
       group.addEventListener('keydown', e => {
         const btns = Array.from(group.querySelectorAll('.seg-btn'));
         const activeIdx = btns.findIndex(b => b.dataset.mode === currentMode);
@@ -780,7 +780,39 @@
 
         e.preventDefault();
         setMode(btns[next].dataset.mode, true);
-        btns[next].focus();
+      });
+
+      // 2. รองรับ Alt + 1..4 และ Alt + ลูกศร จากทุกจุดบนหน้าจอ (ไม่เกี่ยงภาษาไทย/อังกฤษ)
+      document.addEventListener('keydown', e => {
+        if (e.altKey && !e.ctrlKey && !e.shiftKey) {
+          const codeMap = {
+            'Digit1': 'normal', 'Numpad1': 'normal',
+            'Digit2': 'rare',   'Numpad2': 'rare',
+            'Digit3': 'ref',    'Numpad3': 'ref',
+            'Digit4': 'thesis', 'Numpad4': 'thesis'
+          };
+
+          if (codeMap[e.code]) {
+            e.preventDefault();
+            setMode(codeMap[e.code], true);
+            return;
+          }
+
+          if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) {
+            const btns = Array.from(document.querySelectorAll('.seg-btn'));
+            const activeIdx = btns.findIndex(b => b.dataset.mode === currentMode);
+            let next = activeIdx;
+
+            if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+              next = (activeIdx + 1) % btns.length;
+            } else {
+              next = (activeIdx - 1 + btns.length) % btns.length;
+            }
+
+            e.preventDefault();
+            setMode(btns[next].dataset.mode, true);
+          }
+        }
       });
     }
 
@@ -820,6 +852,7 @@
         btn.classList.toggle('active-mode', on);
         btn.setAttribute('aria-checked', on ? 'true' : 'false');
         btn.tabIndex = on ? 0 : -1;
+        if (on && !returnFocusToInput) btn.focus();
       });
       document.getElementById('modeHint').textContent = MODE_HINTS[mode] || '';
 
@@ -1051,17 +1084,11 @@
       if (event.key === 'Enter') {
         event.preventDefault();
         generateLabel();
-      } else if (event.altKey && ['1', '2', '3', '4'].includes(event.key)) {
-        event.preventDefault();
-        const idx = parseInt(event.key, 10) - 1;
-        if (MODES[idx]) {
-          setMode(MODES[idx], true);
-        }
       }
     }
 
     initFontScale();
-    initSegmented();
+    initKeyboardShortcuts();
     detectPrintFont();
     if (document.fonts && document.fonts.ready) {
       document.fonts.ready.then(() => { detectPrintFont(); checkFit(); });
