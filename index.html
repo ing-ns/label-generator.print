@@ -251,7 +251,6 @@
       gap: 10px;
     }
 
-    /* ป้ายแสดงจำนวนบรรทัดที่ปรับปรุงดีไซน์แล้ว */
     .line-count-tag {
       display: inline-flex;
       align-items: center;
@@ -422,75 +421,91 @@
     @media (prefers-reduced-motion: reduce) {
       * { transition: none !important; animation: none !important; }
     }
+
+    /* ========================================================= */
+    /*                 การตั้งค่าการพิมพ์ (Print CSS)            */
+    /* ========================================================= */
     @media print {
       @page {
         size: 30mm 40mm;
         margin: 0;
       }
-      body * {
-        visibility: hidden;
+
+      html, body {
+        width: 30mm !important;
+        height: 40mm !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #ffffff !important;
+        overflow: hidden !important;
       }
 
-      /* แสดงเฉพาะส่วนป้าย preview */
-      .stage, .stage * {
-        visibility: visible;
-       }
-
-     .stage {
-       position: absolute;
-       left: 0;
-       top: 0;
-       width: 100%;
-       height: 100%;
-       padding: 0;
-       margin: 0;
-       background: transparent;
+      /* ซ่อนองค์ประกอบอื่นๆ เพื่อลบพื้นที่ส่วนเกินออก */
+      .app-header, 
+      .card, 
+      .note, 
+      .mode-hint, 
+      .result-head, 
+      .raw-input-display {
+        display: none !important;
       }
 
-     .label-preview {
-       /* 1. ฟอนต์ Angsana New ขนาด 24pt */
-       font-family: 'Angsana New', 'Sarabun', sans-serif !important;
-       font-size: 24pt !important;
-
-       /* 2. ตัวหนา */
-       font-weight: bold !important;
-
-       /* 3. จัดชิดซ้ายแนวนอน และตรงกลางแนวตั้ง */
-       text-align: left !important;
-       display: flex !important;
-       flex-direction: column !important;
-       justify-content: center !important;
-       align-items: flex-start !important;
-
-       /* 4. ระยะบรรทัดสุทธิ (24pt - 11pt) */
-       line-height: 13pt !important;
-
-       /* ปรับแต่งการแสดงผลพิมพ์ */
-       border: none !important;
-       box-shadow: none !important;
-       width: 100% !important;
-       height: 100% !important;
-       white-space: pre-line !important;
+      /* ล็อกพื้นที่ป้ายให้อยู่ตรงกลางแผ่นกระดาษสติ๊กเกอร์ */
+      .stage {
+        position: fixed !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 30mm !important;
+        height: 40mm !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+        page-break-after: avoid !important;
+        page-break-inside: avoid !important;
       }
-      /* 1. กรณี 2 และ 3 บรรทัด (24pt - 7pt = 17pt) */
-     .label-preview[data-lines="2"],
-     .label-preview[data-lines="3"] {
-       line-height: 36pt !important;
-     }
 
-       /* 2. กรณี 4 บรรทัด (24pt - 11pt = 13pt) */
-     .label-preview[data-lines="4"] {
-       line-height: 30pt !important;
-     }
-      /* 3. กรณี 5 บรรทัด (24pt - 13pt = 11pt) */
-     .label-preview[data-lines="5"] {
-       line-height: 25pt !important;
-     }
-      /* 4. กรณี 6 บรรทัดขึ้นไป (24pt - 16pt = 8pt) */
-     .label-preview[data-lines="6"],
-     .label-preview[data-lines="7"] {
-       line-height: 22pt !important;
-     }
+      .label-preview {
+        font-family: 'Angsana New', 'Sarabun', sans-serif !important;
+        font-size: 24pt !important;
+        font-weight: bold !important;
+        text-align: left !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        align-items: flex-start !important;
+        width: 100% !important;
+        height: 100% !important;
+        padding: 0 2mm !important;
+        box-sizing: border-box !important;
+        border: none !important;
+        box-shadow: none !important;
+        background: transparent !important;
+        white-space: pre-line !important;
+      }
+
+      /* กำหนดระยะห่างระหว่างบรรทัดแยกตามจำนวนบรรทัด */
+      .label-preview[data-lines="2"],
+      .label-preview[data-lines="3"] {
+        line-height: 36pt !important;
+      }
+
+      .label-preview[data-lines="4"] {
+        line-height: 30pt !important;
+      }
+
+      .label-preview[data-lines="5"] {
+        line-height: 25pt !important;
+      }
+
+      .label-preview[data-lines="6"],
+      .label-preview[data-lines="7"] {
+        line-height: 22pt !important;
+      }
     }
   </style>
 </head>
