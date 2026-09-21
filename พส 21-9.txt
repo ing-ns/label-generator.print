@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light">
+  <title>ระบบสร้าง Label เลขเรียกหนังสือ</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #e9edee;
+      --surface: #ffffff;
+      --ink: #1e2a2f;
+      --muted: #465960;
+      --line: #e3e8e8;
+      --line-strong: #aebbbc;
+      --track: #eff2f2;
+      --field: #f7f9f9;
+      --seg-active: #ffffff;
+
+      --accent: #2a6f7e;
+      --accent-strong: #1a4b57;
+      --accent-soft: rgba(35, 94, 108, .11);
+      --on-accent: #ffffff;
+      --ring: rgba(35, 94, 108, .30);
+
+      --stage: #f1f4f4;
+      --dash: #c5d1ce;
+      --paper: #ffffff;
+      --paper-ink: #18232a;
+      --paper-line: #d9e2df;
+
+      --shadow-card: 0 1px 2px rgba(20, 40, 45, .04), 0 10px 28px -16px rgba(20, 40, 45, .14);
+      --shadow-paper: 0 1px 1px rgba(20, 40, 45, .06), 0 8px 20px -10px rgba(20, 40, 45, .25);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Sarabun', 'Noto Sans Thai', system-ui, sans-serif;
+      font-size: 16px;
+      line-height: 1.5;
+      background: var(--bg);
+      color: var(--ink);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .app {
+      max-width: 520px;
+      margin: 0 auto;
+      padding: 16px 16px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    /* ---------- header ---------- */
+    .app-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 4px;
+    }
+
+    .app-mark {
+      width: 30px;
+      height: 30px;
+      border-radius: 9px;
+      background: var(--accent-soft);
+      color: var(--accent-strong);
+      display: grid;
+      place-items: center;
+      flex: none;
+    }
+
+    .app-header h1 {
+      font-size: 16px;
+      font-weight: 600;
+      line-height: 1.3;
+    }
+
+    .app-mark svg.ico { width: 17px; height: 17px; }
+
+    svg.ico {
+      width: 20px;
+      height: 20px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* ---------- cards ---------- */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 14px 16px;
+      box-shadow: var(--shadow-card);
+    }
+
+    .field-label {
+      display: block;
+      font-size: 12.5px;
+      font-weight: 400;
+      color: #5f6f76;
+      margin-bottom: 6px;
+    }
+
+    /* ---------- segmented control ---------- */
+    .segmented {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+    }
+
+    .seg-btn {
+      font: inherit;
+      font-size: 13.5px;
+      font-weight: 500;
+      line-height: 1.3;
+      color: var(--ink);
+      background: var(--surface);
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      min-height: 38px;
+      padding: 6px 4px;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      white-space: nowrap;
+      text-align: center;
+      cursor: pointer;
+      transition: background-color .15s ease, color .15s ease, border-color .15s ease;
+    }
+
+    .seg-emoji { font-size: 15px; line-height: 1; }
+
+    .seg-btn:hover:not(.active-mode) {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+    }
+
+    .seg-btn.active-mode {
+      background: var(--accent-strong);
+      border-color: var(--accent-strong);
+      color: #ffffff;
+      font-weight: 600;
+      box-shadow: 0 1px 3px rgba(20, 40, 45, .2);
+    }
+
+    .mode-hint {
+      margin-top: 6px;
+      min-height: 19px;
+      font-size: 12px;
+      color: #66757b;
+      padding-left: 2px;
+    }
+
+    /* ---------- input ---------- */
+    .entry {
+      margin-top: 8px;
+      padding-top: 10px;
+      border-top: 1px solid var(--line);
+    }
+
+    .input-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    #callNumberInput {
+      flex: 1;
+      min-width: 0;
+      height: 44px;
+      padding: 0 14px;
+      font: inherit;
+      font-size: 16px;
+      color: var(--ink);
+      background: var(--field);
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      outline: none;
+      transition: border-color .15s ease, box-shadow .15s ease, background-color .15s ease;
+    }
+
+    #callNumberInput::placeholder { color: #5f6f76; opacity: 1; font-size: 15px; }
+
+    #callNumberInput:focus {
+      border-color: var(--accent);
+      background: var(--surface);
+      box-shadow: 0 0 0 4px var(--ring);
+    }
+
+    .btn-generate {
+      height: 44px;
+      padding: 0 22px;
+      font: inherit;
+      font-size: 14.5px;
+      font-weight: 600;
+      color: var(--on-accent);
+      background: var(--accent);
+      border: 0;
+      border-radius: 11px;
+      cursor: pointer;
+      transition: background-color .15s ease, transform .05s ease;
+    }
+
+    .btn-generate:hover { background: var(--accent-strong); }
+    .btn-generate:active { transform: translateY(1px); }
+
+    .key-hint {
+      margin-top: 6px;
+      font-size: 13px;
+      color: var(--muted);
+      padding-left: 2px;
+    }
+
+    kbd {
+      font: inherit;
+      font-size: 12px;
+      font-weight: 500;
+      padding: 0 5px;
+      border: 1px solid var(--line);
+      border-bottom-width: 2px;
+      border-radius: 6px;
+      background: var(--field);
+      color: var(--ink);
+    }
+
+    /* ---------- result ---------- */
+    .result-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .result-head h2 {
+      font-size: 16px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* ป้ายแสดงจำนวนบรรทัดที่ปรับปรุงดีไซน์แล้ว */
+    .line-count-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--muted);
+      background: #ffffff;
+      border: 1px solid var(--line);
+      padding: 4px 11px;
+      border-radius: 20px;
+      line-height: 1.2;
+      transition: all 0.25s ease;
+      user-select: none;
+    }
+
+    .line-count-tag.active {
+      color: var(--accent-strong);
+      background: #ffffff;
+      border-color: rgba(42, 111, 126, 0.3);
+      box-shadow: 0 2px 6px rgba(42, 111, 126, 0.1);
+    }
+
+    .line-ico {
+      width: 14px;
+      height: 13px;
+      stroke: currentColor;
+      stroke-width: 2.2;
+      stroke-linecap: round;
+      fill: none;
+      opacity: 0.85;
+    }
+
+    .btn-copy {
+      min-width: 104px;
+      justify-content: center;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      height: 32px;
+      padding: 0 12px;
+      font: inherit;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--accent-strong);
+      background: transparent;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+    }
+
+    .btn-copy svg.ico { width: 16px; height: 16px; }
+    .btn-copy .i-check { display: none; }
+
+    .btn-copy:hover:not(:disabled) {
+      background: var(--accent-soft);
+      border-color: var(--accent);
+    }
+
+    .btn-copy:disabled { opacity: .45; cursor: default; }
+
+    .btn-copy.copied { border-color: var(--line); background: var(--field); color: var(--muted); font-weight: 400; }
+    .btn-copy.copied .i-copy { display: none; }
+    .btn-copy.copied .i-check { display: block; }
+
+    /* พื้นที่วางป้าย */
+    .stage {
+      background: var(--stage);
+      border-radius: 12px;
+      padding: 14px 16px;
+      display: grid;
+      place-items: center;
+      min-height: 110px;
+    }
+
+    .label-preview {
+      min-width: 170px;
+      max-width: 100%;
+      padding: 12px 28px;
+      text-align: left;
+      white-space: pre-line;
+      word-break: break-word;
+      font-size: 20px;
+      font-weight: 600;
+      line-height: 1.4;
+      letter-spacing: .01em;
+      color: var(--paper-ink);
+      background: var(--paper);
+      border: 1px solid var(--paper-line);
+      border-radius: 8px;
+      box-shadow: var(--shadow-paper);
+      user-select: all;
+    }
+
+    .label-preview.is-empty {
+      font-size: 14px;
+      font-weight: 400;
+      letter-spacing: 0;
+      text-align: center;
+      color: var(--muted);
+      background: transparent;
+      border: 1.5px dashed var(--dash);
+      box-shadow: none;
+      user-select: none;
+      min-width: 0;
+      padding: 20px 20px;
+    }
+
+    .label-preview::selection,
+    .label-preview *::selection {
+      background: rgba(35, 94, 108, .2);
+      color: inherit;
+    }
+
+    .label-preview.pop { animation: pop .22s ease-out; }
+
+    @keyframes pop {
+      from { opacity: .4; transform: translateY(4px); }
+      to   { opacity: 1;  transform: none; }
+    }
+
+    .raw-input-display {
+      display: none;
+      margin-top: 8px;
+      text-align: left;
+      font-size: 13px;
+      line-height: 1.4;
+      color: var(--muted);
+      word-break: break-word;
+    }
+
+    .raw-input-display.show { display: block; }
+    .raw-input-display span { font-weight: 400; margin-left: 2px; }
+
+    .sr-only {
+      position: absolute;
+      width: 1px; height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+    }
+
+    .note {
+      font-size: 13px;
+      color: var(--muted);
+      text-align: center;
+      padding: 0 8px;
+    }
+
+    :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    #callNumberInput:focus-visible { outline: none; }
+
+    @media (max-width: 360px) {
+      .seg-btn { flex-direction: column; gap: 2px; min-height: 54px; }
+      .seg-emoji { font-size: 18px; }
+    }
+
+    @media (max-width: 380px) {
+      .app { padding: 12px 12px 16px; }
+      .card { padding: 12px 14px; }
+      .input-row { flex-direction: column; }
+      #callNumberInput { flex: none; width: 100%; }
+      .btn-generate { width: 100%; }
+      .label-preview { padding: 12px 22px; font-size: 19px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * { transition: none !important; animation: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+
+    <header class="app-header">
+      <div class="app-mark" aria-hidden="true">
+        <svg class="ico" viewBox="0 0 24 24"><rect x="6" y="3" width="12" height="18" rx="2.5"/><path d="M9.5 8h5M9.5 12h5M9.5 16h3"/></svg>
+      </div>
+      <h1>ระบบสร้าง Label เลขเรียกหนังสือ</h1>
+    </header>
+
+    <!-- เลือกประเภท + กรอกข้อมูล -->
+    <section class="card" aria-label="ป้อนข้อมูล">
+      <span class="field-label" id="modeLabel">ประเภทหนังสือ</span>
+      <div class="segmented" role="radiogroup" aria-labelledby="modeLabel">
+        <button type="button" class="seg-btn active-mode" data-mode="normal" role="radio" aria-checked="true"  onclick="setMode('normal')"><span class="seg-emoji" aria-hidden="true">📖</span><span>ทั่วไป / CRE</span></button>
+        <button type="button" class="seg-btn" data-mode="rare"   role="radio" aria-checked="false" tabindex="-1" onclick="setMode('rare')"><span class="seg-emoji" aria-hidden="true">📜</span><span>หายาก</span></button>
+        <button type="button" class="seg-btn" data-mode="ref"    role="radio" aria-checked="false" tabindex="-1" onclick="setMode('ref')"><span class="seg-emoji" aria-hidden="true">🔍</span><span>อ้างอิง</span></button>
+        <button type="button" class="seg-btn" data-mode="thesis" role="radio" aria-checked="false" tabindex="-1" onclick="setMode('thesis')"><span class="seg-emoji" aria-hidden="true">🎓</span><span>วพ</span></button>
+      </div>
+      <p class="mode-hint" id="modeHint">รวมถึงนิยาย / การ์ตูน / DOC</p>
+
+      <div class="entry">
+        <label class="field-label" for="callNumberInput">เลขเรียกหนังสือ</label>
+        <div class="input-row">
+          <input
+            type="text"
+            id="callNumberInput"
+            placeholder="กรอกเลขเรียกหนังสือที่นี่"
+            autocomplete="off"
+            onkeydown="handleKeyDown(event)"
+            autofocus
+          >
+          <button type="button" class="btn-generate" onclick="generateLabel()">สร้าง</button>
+        </div>
+        <p class="key-hint">กด <kbd>Enter</kbd> เพื่อสร้างและคัดลอกให้อัตโนมัติ</p>
+      </div>
+    </section>
+
+    <!-- ผลลัพธ์ -->
+    <section class="card" aria-label="ผลลัพธ์">
+      <div class="result-head">
+        <h2>
+          ผลลัพธ์ 
+          <span id="lineCount" class="line-count-tag">
+            <svg class="line-ico" viewBox="0 0 24 24" aria-hidden="true">
+              <line x1="4" y1="6" x2="20" y2="6"></line>
+              <line x1="4" y1="12" x2="20" y2="12"></line>
+              <line x1="4" y1="18" x2="14" y2="18"></line>
+            </svg>
+            <span id="lineCountText">- บรรทัด</span>
+          </span>
+        </h2>
+        <button type="button" class="btn-copy" id="copyBtn" onclick="copyResult()" disabled>
+          <svg class="ico i-copy" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2.5"/><path d="M5 15V6.5A2.5 2.5 0 0 1 7.5 4H16"/></svg>
+          <svg class="ico i-check" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+          <span class="btn-text">คัดลอก</span>
+        </button>
+      </div>
+
+      <div class="stage">
+        <div id="labelPreview" class="label-preview is-empty">ผลลัพธ์จะแสดงที่นี่</div>
+      </div>
+
+      <div id="rawInputDisplay" class="raw-input-display"></div>
+      <div id="copyToast" class="sr-only" role="status" aria-live="polite"></div>
+    </section>
+
+    <p class="note">ระบบคัดลอกผลลัพธ์ให้อัตโนมัติ กด <kbd>Ctrl</kbd> + <kbd>V</kbd> เพื่อวางได้เลย</p>
+
+  </main>
+
+  <script>
+
+    let currentMode = 'normal';
+    let lastRawInput = '';
+
+    function escapeHtml(str) {
+      return str
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    const MODE_HINTS = {
+      normal: 'รวมถึงนิยาย / การ์ตูน / DOC',
+      rare:   'เติม ก หรือ Ra',
+      ref:    'เติม อ หรือ R',
+      thesis: 'เติม วพ หรือ T'
+    };
+
+    function setMode(mode) {
+      currentMode = mode;
+      document.querySelectorAll('.seg-btn').forEach(btn => {
+        const on = btn.dataset.mode === mode;
+        btn.classList.toggle('active-mode', on);
+        btn.setAttribute('aria-checked', on ? 'true' : 'false');
+        btn.tabIndex = on ? 0 : -1;
+      });
+      document.getElementById('modeHint').textContent = MODE_HINTS[mode] || '';
+
+      const input = document.getElementById('callNumberInput').value;
+      if (input.trim() || lastRawInput) {
+        generateLabel(true);
+      }
+    }
+
+    function setPreview(text, isEmpty) {
+      const el = document.getElementById('labelPreview');
+      el.innerText = text;
+      el.classList.toggle('is-empty', isEmpty);
+
+      const lineCountEl = document.getElementById('lineCount');
+      const countTextEl = document.getElementById('lineCountText');
+
+      if (lineCountEl && countTextEl) {
+        if (isEmpty) {
+          countTextEl.textContent = '- บรรทัด';
+          lineCountEl.classList.remove('active');
+        } else {
+          const lines = text.split('\n');
+          countTextEl.textContent = lines.length + ' บรรทัด';
+          lineCountEl.classList.add('active');
+        }
+      }
+
+      copiedState = false;
+      clearTimeout(copyTimer);
+      renderCopyBtn();
+      if (!isEmpty) {
+        el.classList.remove('pop');
+        void el.offsetWidth;
+        el.classList.add('pop');
+      }
+    }
+
+    function hasThai(str) {
+      return /[\u0E00-\u0E7F]/i.test(str);
+    }
+
+    function getPrefixForMode(mode, inputStr) {
+      if (mode === 'normal') return null;
+      const isThai = hasThai(inputStr);
+      if (mode === 'rare') return isThai ? 'ก' : 'Ra';
+      if (mode === 'ref') return isThai ? 'อ' : 'R';
+      if (mode === 'thesis') return isThai ? 'วพ' : 'T';
+      return null;
+    }
+
+    function countLetters(str) {
+      const matches = str.match(/[^\d\s\.]/g);
+      return matches ? matches.length : 0;
+    }
+
+    function parseCutters(rawCutterStr) {
+      if (!rawCutterStr) return [];
+      let clean = rawCutterStr.replace(/\./g, ' ').trim();
+      if (!clean) return [];
+
+      const units = clean.match(/[^\d\s]+\d*/g) || clean.split(/\s+/);
+      const cutterLines = [];
+      let currentLine = '';
+      let currentLetterCount = 0;
+
+      for (let unit of units) {
+        unit = unit.replace(/\./g, '');
+        const unitLetters = countLetters(unit);
+
+        if (!currentLine) {
+          currentLine = unit;
+          currentLetterCount = unitLetters;
+        } else {
+          if (currentLetterCount + unitLetters <= 2) {
+            currentLine += unit;
+            currentLetterCount += unitLetters;
+          } else {
+            cutterLines.push(currentLine);
+            currentLine = unit;
+            currentLetterCount = unitLetters;
+          }
+        }
+      }
+      if (currentLine) cutterLines.push(currentLine);
+
+      return cutterLines;
+    }
+
+    function generateLabel(fromModeChange = false) {
+      const inputEl = document.getElementById('callNumberInput');
+      let rawInput = inputEl.value;
+
+      if (!rawInput.trim() && fromModeChange && lastRawInput) {
+        rawInput = lastRawInput;
+      }
+
+      const previewEl = document.getElementById('labelPreview');
+      const rawDisplayEl = document.getElementById('rawInputDisplay');
+      document.getElementById('copyToast').innerText = '';
+
+      let str = rawInput.trim();
+      if (!str) {
+        setPreview('กรุณากรอกข้อมูล', true);
+        if (rawDisplayEl) {
+          rawDisplayEl.innerHTML = '';
+          rawDisplayEl.classList.remove('show');
+        }
+        return;
+      }
+
+      lastRawInput = str;
+
+      if (rawDisplayEl) {
+        rawDisplayEl.innerHTML = 'จาก Call No.: <span>' + escapeHtml(str) + '</span>';
+        rawDisplayEl.classList.add('show');
+      }
+
+      inputEl.value = '';
+
+      let lines = [];
+
+      // เงื่อนไข CRE
+      if (/CRE/i.test(str)) {
+        let clean = str.replace(/^(Ra|ก|อ|R|วพ|T)\s+/i, '').replace(/^CRE\s+/i, '').trim();
+        const tokens = clean.split(/\s+/).filter(t => t.length > 0);
+        let year = '', accession = '', volParts = [];
+
+        for (let t of tokens) {
+          if (!year && /^[12]\d{3}(?:-(?:[12]\d{3}|\d{2}))?$/.test(t)) year = t;
+          else if (!accession && /^\d+$/.test(t)) accession = t;
+          else volParts.push(t);
+        }
+
+        lines = ['Ra', 'CRE'];
+        if (year) lines.push(year);
+        if (accession) lines.push(accession);
+        if (volParts.length > 0) lines.push(volParts.join(' '));
+      } else {
+        const prefixLine = getPrefixForMode(currentMode, str);
+        str = str.replace(/^(Ra|ก|อ|R|วพ|T)\s+/i, '');
+
+        // นิยาย
+        const ficMatch = str.match(/^(นว|Fic|กต|Comic)[\s\.]*/i);
+        let ficPrefix = null;
+        if (ficMatch) {
+          ficPrefix = ficMatch[1];
+          str = str.substring(ficMatch[0].length).trim();
+        }
+
+        let classPrefix = '', classNum = '';
+        if (!ficPrefix) {
+          const classMatch = str.match(/^([A-Za-z\u0E00-\u0E7F]+)\s*(\d+(?:\.\d+)?)/);
+          if (classMatch) {
+            classPrefix = classMatch[1];
+            classNum = classMatch[2];
+            str = str.substring(classMatch[0].length).trim();
+          }
+        }
+
+        // ดึงปี/เดือน-ปี/ช่วงเดือน-ปี
+        const monthRegexStr = `(?:ม\\.ค\\.?|ก\\.พ\\.?|มี\\.ค\\.?|เม\\.ย\\.?|พ\\.ค\\.?|มิ\\.ย\\.?|ก\\.ค\\.?|ส\\.ค\\.?|ก\\.ย\\.?|ต\\.ค\\.?|พ\\.ย\\.?|ธ\\.ค\\.?|มกราคม|กุมภาพันธ์|มีนาคม|เมษายน|พฤษภาคม|มิถุนายน|กรกฎาคม|สิงหาคม|กันยายน|ตุลาคม|พฤศจิกายน|ธันวาคม|Jan[a-zA-Z]*\\.?|Feb[a-zA-Z]*\\.?|Mar[a-zA-Z]*\\.?|Apr[a-zA-Z]*\\.?|May[a-zA-Z]*\\.?|Jun[a-zA-Z]*\\.?|Jul[a-zA-Z]*\\.?|Aug[a-zA-Z]*\\.?|Sep[a-zA-Z]*\\.?|Sept[a-zA-Z]*\\.?|Oct[a-zA-Z]*\\.?|Nov[a-zA-Z]*\\.?|Dec[a-zA-Z]*\\.?)`;
+        
+        const yearRegexStr = `(?:[12]\\d{3})`;
+
+        const patternMonthYearRange = new RegExp(monthRegexStr + '\\s*' + yearRegexStr + '\\s*-\\s*' + monthRegexStr + '\\s*' + yearRegexStr, 'i');
+        const patternMonthRangeYear = new RegExp(monthRegexStr + '\\s*-\\s*' + monthRegexStr + '\\s*' + yearRegexStr, 'i');
+        const patternMonthYear = new RegExp(monthRegexStr + '\\s*' + yearRegexStr, 'i');
+        const yearPattern = /\b[12]\d{3}(?:-(?:[12]\d{3}|\d{2}))?\b/;
+
+        const yearMatch = str.match(patternMonthYearRange) ||
+                          str.match(patternMonthRangeYear) ||
+                          str.match(patternMonthYear) ||
+                          str.match(yearPattern);
+
+        let year = '', restBeforeYear = str, restAfterYear = '';
+        if (yearMatch) {
+          year = yearMatch[0];
+          const idx = yearMatch.index;
+          restBeforeYear = str.substring(0, idx).trim();
+          restAfterYear = str.substring(idx + year.length).trim();
+        }
+
+        // ดึงช่วงเดือนโดดๆ
+        const monthPattern = /(?:[\u0E00-\u0E7F]+\.[\u0E00-\u0E7F]+\.-[\u0E00-\u0E7F]+\.[\u0E00-\u0E7F]+\.?|[A-Za-z]{3,4}\.?-[A-Za-z]{3,4}\.?)/i;
+        let monthStr = '';
+        const monthMatchAfter = restAfterYear.match(monthPattern);
+        if (monthMatchAfter) {
+          monthStr = monthMatchAfter[0];
+          restAfterYear = (restAfterYear.substring(0, monthMatchAfter.index) + ' ' + restAfterYear.substring(monthMatchAfter.index + monthStr.length)).trim();
+        } else {
+          const monthMatchBefore = restBeforeYear.match(monthPattern);
+          if (monthMatchBefore) {
+            monthStr = monthMatchBefore[0];
+            restBeforeYear = (restBeforeYear.substring(0, monthMatchBefore.index) + ' ' + restBeforeYear.substring(monthMatchBefore.index + monthStr.length)).trim();
+          }
+        }
+
+        // ดึงเล่ม/ตอน/Part
+        let volAndPartsStr = restAfterYear;
+        let cutterStr = restBeforeYear;
+
+        if (!year && !monthStr) {
+          const volPartMatch = cutterStr.match(/(?:\s+|^)((?:ล\.|เล่ม|v\.|V\.|c\.|C\.|bd\.|pt\.|Pt\.|vol\.|Vol\.|ฉ\.|ต\.|ตอน|part|Part)\s*\d+.*)$/i);
+          if (volPartMatch) {
+            volAndPartsStr = volPartMatch[1].trim();
+            cutterStr = cutterStr.substring(0, volPartMatch.index).trim();
+          }
+        }
+
+        let volPartLines = [];
+        if (volAndPartsStr) {
+          const tokens = volAndPartsStr.match(/(?:ล\.|เล่ม|v\.|V\.|c\.|C\.|bd\.|vol\.|Vol\.|ฉ\.|ต\.|ตอน|pt\.|Pt\.|part|Part)\s*\d+[a-zA-Z\u0E00-\u0E7F]*/gi);
+          if (tokens) {
+            volPartLines = tokens.map(t => t.trim());
+          } else {
+            volPartLines = [volAndPartsStr];
+          }
+        }
+
+        const cutterLines = parseCutters(cutterStr);
+
+        if (prefixLine) lines.push(prefixLine);
+        if (ficPrefix) {
+          lines.push(ficPrefix);
+        } else {
+          if (classPrefix) lines.push(classPrefix);
+          if (classNum) lines.push(classNum);
+        }
+        lines.push(...cutterLines);
+        if (year) lines.push(year);
+        if (monthStr) lines.push(monthStr);
+        lines.push(...volPartLines);
+      }
+
+      // หากมีมากกว่า 7 บรรทัด ให้นำบรรทัดที่ 7 เป็นต้นไปมารวมไว้ที่บรรทัดที่ 7
+      if (lines.length > 7) {
+        const top6 = lines.slice(0, 6);
+        const rest = lines.slice(6).join(' ');
+        lines = [...top6, rest];
+      }
+
+      setPreview(lines.join('\n'), false);
+      copyResult();
+    }
+
+    function handleKeyDown(event) {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        generateLabel();
+      }
+    }
+
+    function selectText(elementId) {
+      const element = document.getElementById(elementId);
+      if (!element) return;
+      const range = document.createRange();
+      range.selectNodeContents(element);
+      const selection = window.getSelection();
+      selection.removeAllRanges();
+      selection.addRange(range);
+    }
+
+    // ---------- คัดลอกอัตโนมัติ ----------
+    let copiedState = false;
+    let copyTimer;
+
+    function isResultEmpty() {
+      return document.getElementById('labelPreview').classList.contains('is-empty');
+    }
+
+    function renderCopyBtn() {
+      const btn = document.getElementById('copyBtn');
+      const empty = isResultEmpty();
+      const done = copiedState && !empty;
+      btn.disabled = empty;
+      btn.classList.toggle('copied', done);
+      btn.querySelector('.btn-text').textContent = done ? 'คัดลอกแล้ว' : 'คัดลอก';
+    }
+
+    function showCopied() {
+      copiedState = true;
+      renderCopyBtn();
+      document.getElementById('copyToast').textContent = 'คัดลอกเรียบร้อย';
+    }
+
+    function copyResult() {
+      const el = document.getElementById('labelPreview');
+      if (isResultEmpty()) return;
+      const text = el.innerText;
+
+      const fallback = () => {
+        selectText('labelPreview');
+        try {
+          if (document.execCommand('copy')) {
+            showCopied();
+            window.getSelection().removeAllRanges();
+          }
+        } catch (e) {}
+      };
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(showCopied).catch(fallback);
+      } else {
+        fallback();
+      }
+    }
+
+    // เลือกประเภทด้วยคีย์บอร์ด: ลูกศรซ้าย/ขวา (หรือขึ้น/ลง)
+    document.querySelector('.segmented').addEventListener('keydown', function (e) {
+      const keys = ['ArrowLeft', 'ArrowUp', 'ArrowRight', 'ArrowDown'];
+      if (!keys.includes(e.key)) return;
+      e.preventDefault();
+      const btns = Array.from(document.querySelectorAll('.seg-btn'));
+      const i = btns.findIndex(b => b.dataset.mode === currentMode);
+      const step = (e.key === 'ArrowLeft' || e.key === 'ArrowUp') ? -1 : 1;
+      const next = btns[(i + step + btns.length) % btns.length];
+      next.focus();
+      setMode(next.dataset.mode);
+    });
+
+  </script>
+</body>
+</html>
