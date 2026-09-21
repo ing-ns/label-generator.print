@@ -110,6 +110,38 @@
       margin-bottom: 6px;
     }
 
+    .field-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .font-scale-control {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12.5px;
+      color: #5f6f76;
+    }
+
+    .select-scale {
+      font: inherit;
+      font-size: 12.5px;
+      font-weight: 500;
+      color: var(--ink);
+      background: var(--field);
+      border: 1px solid var(--line-strong);
+      border-radius: 6px;
+      padding: 2px 6px;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .select-scale:focus {
+      border-color: var(--accent);
+    }
+
     /* ---------- Segmented Control ---------- */
     .segmented {
       display: grid;
@@ -288,15 +320,16 @@
       min-height: 110px;
     }
 
-    /* หน้าจอพรีวิว: ตัวหนังสือชิดซ้าย บล็อกกึ่งกลาง */
+    /* ---------- หน้าจอพรีวิว ---------- */
     .label-preview {
+      --font-scale: 1;
       display: inline-block;
       width: fit-content;
       text-align: left;
       white-space: pre-line;
       word-break: break-word;
       font-family: 'Angsana New', 'AngsanaUPC', 'Sarabun', sans-serif;
-      font-size: 24pt;
+      font-size: calc(24pt * var(--font-scale, 1));
       font-style: normal;
       font-weight: 700;
       letter-spacing: .01em;
@@ -309,14 +342,14 @@
       user-select: all;
     }
 
-    /* ตั้งค่าระยะห่างบรรทัดตามจำนวนบรรทัด (หน้าจอ) */
-    #labelPreview[data-lines="1"] { line-height: 10pt !important; }
-    #labelPreview[data-lines="2"] { line-height: 10pt !important; }
-    #labelPreview[data-lines="3"] { line-height: 10pt !important; }
-    #labelPreview[data-lines="4"] { line-height: 10pt !important; } /* <--- กรณีผลลัพธ์มี 4 บรรทัด */
-    #labelPreview[data-lines="5"] { line-height: 10pt !important; }
-    #labelPreview[data-lines="6"] { line-height: 10pt !important; }
-    #labelPreview[data-lines="7"] { line-height: 10pt !important; }
+    /* ระยะห่างบรรทัดแยกตามจำนวนบรรทัด (บนหน้าจอ) */
+    #labelPreview[data-lines="1"] { line-height: 28pt; }
+    #labelPreview[data-lines="2"] { line-height: 22pt; }
+    #labelPreview[data-lines="3"] { line-height: 19pt; }
+    #labelPreview[data-lines="4"] { line-height: 17pt; }
+    #labelPreview[data-lines="5"] { line-height: 15pt; }
+    #labelPreview[data-lines="6"] { line-height: 13.5pt; }
+    #labelPreview[data-lines="7"] { line-height: 12pt; }
 
     .label-preview.is-empty {
       display: block;
@@ -350,7 +383,7 @@
     .raw-input-display span { font-weight: 400; margin-left: 2px; }
 
     /* ========================================================= */
-    /*   การตั้งค่าพิมพ์: Angsana New ขนาด 24pt ตัวตรง ชิดซ้ายกึ่งกลาง    */
+    /*   การตั้งค่าพิมพ์: 3x4 ซม. Angsana New จัดกึ่งกลางสมบูรณ์   */
     /* ========================================================= */
     @media print {
       @page {
@@ -391,36 +424,36 @@
       }
 
       #labelPreview {
-        display: block !important;
-        width: 100% !important;
+        display: inline-block !important;
+        width: fit-content !important;
         text-align: left !important;
 
         font-family: 'Angsana New', 'AngsanaUPC', sans-serif !important;
-        font-size: 24pt !important;
+        font-size: calc(24pt * var(--font-scale, 1)) !important;
         font-style: normal !important;
         font-weight: bold !important;
         color: #000000 !important;
-        white-space: pre !important;
+        white-space: pre-line !important;
 
         background: transparent !important;
         border: none !important;
         box-shadow: none !important;
         border-radius: 0 !important;
         padding: 0 !important;
-        margin: auto !important;
+        margin: 0 auto !important;
 
         page-break-inside: avoid !important;
         break-inside: avoid !important;
       }
 
-      /* ตั้งค่าระยะห่างบรรทัดตามจำนวนบรรทัด (สำหรับการพิมพ์) */
+      /* ระยะห่างบรรทัดขณะสั่งพิมพ์ */
       #labelPreview[data-lines="1"] { line-height: 1.2 !important; }
-      #labelPreview[data-lines="2"] { line-height: 0.95 !important; }
-      #labelPreview[data-lines="3"] { line-height: 0.80 !important; }
-      #labelPreview[data-lines="4"] { line-height: 0.70 !important; }
-      #labelPreview[data-lines="5"] { line-height: 0.62 !important; }
-      #labelPreview[data-lines="6"] { line-height: 0.55 !important; }
-      #labelPreview[data-lines="7"] { line-height: 0.50 !important; }
+      #labelPreview[data-lines="2"] { line-height: 1.2 !important; }
+      #labelPreview[data-lines="3"] { line-height: 1.2 !important; }
+      #labelPreview[data-lines="4"] { line-height: 0.9 !important; }
+      #labelPreview[data-lines="5"] { line-height: 0.75 !important; }
+      #labelPreview[data-lines="6"] { line-height: 0.65 !important; }
+      #labelPreview[data-lines="7"] { line-height: 0.6 !important; }
     }
   </style>
 </head>
@@ -445,7 +478,25 @@
       <p class="mode-hint" id="modeHint">รวมถึงนิยาย / การ์ตูน / DOC</p>
 
       <div class="entry">
-        <label class="field-label" for="callNumberInput">เลขเรียกหนังสือ</label>
+        <div class="field-header-row">
+          <label class="field-label" for="callNumberInput" style="margin-bottom: 0;">เลขเรียกหนังสือ</label>
+          <div class="font-scale-control">
+            <label for="fontScaleSelect">ขนาดฟอนต์:</label>
+            <select id="fontScaleSelect" class="select-scale" onchange="updateFontScale(this.value)">
+              <option value="100" selected>100% (ปกติ)</option>
+              <option value="95">95%</option>
+              <option value="90">90%</option>
+              <option value="85">85%</option>
+              <option value="80">80%</option>
+              <option value="75">75%</option>
+              <option value="70">70%</option>
+              <option value="65">65%</option>
+              <option value="60">60%</option>
+              <option value="55">55%</option>
+              <option value="50">50%</option>
+            </select>
+          </div>
+        </div>
         <div class="input-row">
           <input
             type="text"
@@ -487,6 +538,14 @@
   <script>
     let currentMode = 'normal';
     let lastRawInput = '';
+
+    function updateFontScale(percentVal) {
+      const scale = parseFloat(percentVal) / 100;
+      const previewEl = document.getElementById('labelPreview');
+      if (previewEl) {
+        previewEl.style.setProperty('--font-scale', scale);
+      }
+    }
 
     function escapeHtml(str) {
       return str
@@ -657,7 +716,9 @@
         const patternMonthYearRange = new RegExp(monthRegexStr + '\\s*' + yearRegexStr + '\\s*-\\s*' + monthRegexStr + '\\s*' + yearRegexStr, 'i');
         const patternMonthRangeYear = new RegExp(monthRegexStr + '\\s*-\\s*' + monthRegexStr + '\\s*' + yearRegexStr, 'i');
         const patternMonthYear = new RegExp(monthRegexStr + '\\s*' + yearRegexStr, 'i');
-        const yearPattern = /\b[12]\d{3}(?:-(?:[12]\d{3}|\d{2}))?\b/;
+        
+        /* แก้ไขให้มองหาเฉพาะตัวเลขปีพ.ศ./ค.ศ. ที่เป็นอิสระ ไม่อยู่ติดกับตัวอักษรไทยหรืออังกฤษ (ป้องกันการตัดเลขคัดเตอร์ เช่น ก1999) */
+        const yearPattern = /(?<![A-Za-z\u0E00-\u0E7F0-9])[12]\d{3}(?:-(?:[12]\d{3}|\d{2}))?(?![A-Za-z\u0E00-\u0E7F0-9])/;
 
         const yearMatch = str.match(patternMonthYearRange) ||
                           str.match(patternMonthRangeYear) ||
