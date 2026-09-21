@@ -440,21 +440,31 @@
         overflow: hidden !important;
       }
 
-      /* ซ่อนองค์ประกอบอื่นๆ เพื่อลบพื้นที่ส่วนเกินออก */
+      /* ซ่อนองค์ประกอบที่ไม่ต้องการพิมพ์เฉพาะส่วน */
       .app-header, 
-      .card, 
+      section[aria-label="ป้อนข้อมูล"], 
       .note, 
-      .mode-hint, 
       .result-head, 
-      .raw-input-display {
+      .raw-input-display,
+      #copyToast {
         display: none !important;
       }
 
-      /* ล็อกพื้นที่ป้ายให้อยู่ตรงกลางแผ่นกระดาษสติ๊กเกอร์ */
+      /* รีเซ็ต Container หลักเพื่อไม่ให้พื้นที่ซ้อนกันล้นออกมา */
+      .app,
+      section[aria-label="ผลลัพธ์"] {
+        width: 30mm !important;
+        height: 40mm !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: none !important;
+        box-shadow: none !important;
+        background: transparent !important;
+        overflow: hidden !important;
+      }
+
+      /* ล็อกพื้นที่ป้ายให้อยู่ตรงกลางแผ่นกระดาษสติ๊กเกอร์พอดี */
       .stage {
-        position: fixed !important;
-        left: 0 !important;
-        top: 0 !important;
         width: 30mm !important;
         height: 40mm !important;
         padding: 0 !important;
@@ -465,8 +475,6 @@
         display: flex !important;
         justify-content: center !important;
         align-items: center !important;
-        page-break-after: avoid !important;
-        page-break-inside: avoid !important;
       }
 
       .label-preview {
