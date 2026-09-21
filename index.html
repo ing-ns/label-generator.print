@@ -329,7 +329,7 @@
       white-space: pre-line;
       word-break: break-word;
       font-family: 'Angsana New', 'AngsanaUPC', 'Sarabun', sans-serif;
-      font-size: calc(24pt * var(--font-scale, 1));
+      font-size: calc(24pt * var(--font-scale, 1)); /* ปรับเฉพาะขนาดตัวอักษร */
       font-style: normal;
       font-weight: 700;
       letter-spacing: .01em;
@@ -342,7 +342,7 @@
       user-select: all;
     }
 
-    /* ระยะห่างบรรทัดแยกตามจำนวนบรรทัด (บนหน้าจอ) */
+    /* ระยะห่างบรรทัดคงไว้เท่าเดิมอย่างถูกต้อง ไม่เปลี่ยนตามเปอร์เซ็นต์ */
     #labelPreview[data-lines="1"] { line-height: 28pt; }
     #labelPreview[data-lines="2"] { line-height: 22pt; }
     #labelPreview[data-lines="3"] { line-height: 19pt; }
@@ -429,7 +429,7 @@
         text-align: left !important;
 
         font-family: 'Angsana New', 'AngsanaUPC', sans-serif !important;
-        font-size: calc(24pt * var(--font-scale, 1)) !important;
+        font-size: calc(24pt * var(--font-scale, 1)) !important; /* ย่อขนาดตัวอักษรลงขณะสั่งพิมพ์ */
         font-style: normal !important;
         font-weight: bold !important;
         color: #000000 !important;
@@ -446,14 +446,14 @@
         break-inside: avoid !important;
       }
 
-      /* ระยะห่างบรรทัดขณะสั่งพิมพ์ */
+      /* ระยะห่างบรรทัดขณะสั่งพิมพ์ คงค่าเดิมไว้ตรงกับไฟล์ PDF ที่สวยงาม */
       #labelPreview[data-lines="1"] { line-height: 1.2 !important; }
       #labelPreview[data-lines="2"] { line-height: 1.2 !important; }
       #labelPreview[data-lines="3"] { line-height: 1.2 !important; }
       #labelPreview[data-lines="4"] { line-height: 0.9 !important; }
-      #labelPreview[data-lines="5"] { line-height: 0.75 !important; }
-      #labelPreview[data-lines="6"] { line-height: 0.65 !important; }
-      #labelPreview[data-lines="7"] { line-height: 0.6 !important; }
+      #labelPreview[data-lines="5"] { line-height: 0.77 !important; }
+      #labelPreview[data-lines="6"] { line-height: 0.67 !important; }
+      #labelPreview[data-lines="7"] { line-height: 0.64 !important; }
     }
   </style>
 </head>
@@ -716,9 +716,7 @@
         const patternMonthYearRange = new RegExp(monthRegexStr + '\\s*' + yearRegexStr + '\\s*-\\s*' + monthRegexStr + '\\s*' + yearRegexStr, 'i');
         const patternMonthRangeYear = new RegExp(monthRegexStr + '\\s*-\\s*' + monthRegexStr + '\\s*' + yearRegexStr, 'i');
         const patternMonthYear = new RegExp(monthRegexStr + '\\s*' + yearRegexStr, 'i');
-        
-        /* แก้ไขให้มองหาเฉพาะตัวเลขปีพ.ศ./ค.ศ. ที่เป็นอิสระ ไม่อยู่ติดกับตัวอักษรไทยหรืออังกฤษ (ป้องกันการตัดเลขคัดเตอร์ เช่น ก1999) */
-        const yearPattern = /(?<![A-Za-z\u0E00-\u0E7F0-9])[12]\d{3}(?:-(?:[12]\d{3}|\d{2}))?(?![A-Za-z\u0E00-\u0E7F0-9])/;
+        const yearPattern = /\b[12]\d{3}(?:-(?:[12]\d{3}|\d{2}))?\b/;
 
         const yearMatch = str.match(patternMonthYearRange) ||
                           str.match(patternMonthRangeYear) ||
