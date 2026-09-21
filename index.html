@@ -110,36 +110,69 @@
       margin-bottom: 6px;
     }
 
-    .field-header-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 6px;
-    }
-
-    .font-scale-control {
+    /* ---------- Font scale (เล็ก เงียบ ใช้นานๆ ครั้ง) ---------- */
+    .scale-panel {
+      margin-top: 8px;
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 4px;
       font-size: 12.5px;
-      color: #5f6f76;
+      color: var(--muted);
     }
 
-    .select-scale {
+    .scale-title { margin-right: auto; }
+
+    .scale-reset {
       font: inherit;
       font-size: 12.5px;
-      font-weight: 500;
-      color: var(--ink);
-      background: var(--field);
-      border: 1px solid var(--line-strong);
-      border-radius: 6px;
+      color: var(--accent-strong);
+      background: none;
+      border: 0;
       padding: 2px 6px;
-      outline: none;
+      margin-right: 4px;
+      border-radius: 6px;
       cursor: pointer;
+      text-decoration: underline;
+      text-underline-offset: 2px;
     }
 
-    .select-scale:focus {
+    .scale-reset.is-hidden { visibility: hidden; }
+
+    .step-btn {
+      width: 26px;
+      height: 26px;
+      display: grid;
+      place-items: center;
+      color: var(--muted);
+      background: transparent;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+    }
+
+    .step-btn svg.ico { width: 13px; height: 13px; stroke-width: 2.2; }
+
+    .step-btn:hover:not(:disabled) {
+      color: var(--accent-strong);
       border-color: var(--accent);
+      background: var(--accent-soft);
+    }
+
+    .step-btn:disabled { opacity: .35; cursor: default; }
+
+    .step-btn:focus-visible,
+    .scale-reset:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .scale-value {
+      min-width: 3.6ch;
+      text-align: center;
+      font-weight: 500;
+      color: var(--ink);
+      font-variant-numeric: tabular-nums;
     }
 
     /* ---------- Segmented Control ---------- */
@@ -406,6 +439,7 @@
       .app-header,
       .card:first-of-type,
       .result-head,
+      .scale-panel,
       .raw-input-display {
         display: none !important;
       }
@@ -478,25 +512,7 @@
       <p class="mode-hint" id="modeHint">รวมถึงนิยาย / การ์ตูน / DOC</p>
 
       <div class="entry">
-        <div class="field-header-row">
-          <label class="field-label" for="callNumberInput" style="margin-bottom: 0;">เลขเรียกหนังสือ</label>
-          <div class="font-scale-control">
-            <label for="fontScaleSelect">ขนาดฟอนต์:</label>
-            <select id="fontScaleSelect" class="select-scale" onchange="updateFontScale(this.value)">
-              <option value="100" selected>100% (ปกติ)</option>
-              <option value="95">95%</option>
-              <option value="90">90%</option>
-              <option value="85">85%</option>
-              <option value="80">80%</option>
-              <option value="75">75%</option>
-              <option value="70">70%</option>
-              <option value="65">65%</option>
-              <option value="60">60%</option>
-              <option value="55">55%</option>
-              <option value="50">50%</option>
-            </select>
-          </div>
-        </div>
+        <label class="field-label" for="callNumberInput">เลขเรียกหนังสือ</label>
         <div class="input-row">
           <input
             type="text"
@@ -531,6 +547,18 @@
       </div>
 
       <div id="rawInputDisplay" class="raw-input-display"></div>
+
+      <div class="scale-panel" role="group" aria-label="ขนาดตัวอักษร">
+        <span class="scale-title">ขนาดตัวอักษร</span>
+        <button type="button" class="scale-reset is-hidden" id="scaleReset" onclick="updateFontScale(100)">คืนค่าปกติ</button>
+        <button type="button" class="step-btn" id="scaleMinus" aria-label="ลดขนาดตัวอักษร 5%" onclick="nudgeFontScale(-5)">
+          <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/></svg>
+        </button>
+        <span class="scale-value" id="scaleValue" aria-live="polite">100%</span>
+        <button type="button" class="step-btn" id="scalePlus" aria-label="เพิ่มขนาดตัวอักษร 5%" onclick="nudgeFontScale(5)">
+          <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+      </div>
     </section>
 
   </main>
@@ -539,12 +567,40 @@
     let currentMode = 'normal';
     let lastRawInput = '';
 
-    function updateFontScale(percentVal) {
-      const scale = parseFloat(percentVal) / 100;
+    const SCALE_MIN = 50, SCALE_MAX = 100;
+    const SCALE_KEY = 'labelFontScalePct';
+    let currentScale = 100;
+
+    function updateFontScale(percentVal, persist = true) {
+      let pct = Math.round(parseFloat(percentVal));
+      if (!isFinite(pct)) pct = 100;
+      pct = Math.min(SCALE_MAX, Math.max(SCALE_MIN, pct));
+      currentScale = pct;
+
       const previewEl = document.getElementById('labelPreview');
-      if (previewEl) {
-        previewEl.style.setProperty('--font-scale', scale);
+      if (previewEl) previewEl.style.setProperty('--font-scale', pct / 100);
+
+      document.getElementById('scaleValue').textContent = pct + '%';
+      document.getElementById('scaleReset').classList.toggle('is-hidden', pct === 100);
+      document.getElementById('scaleMinus').disabled = pct <= SCALE_MIN;
+      document.getElementById('scalePlus').disabled = pct >= SCALE_MAX;
+
+      if (persist) {
+        try { localStorage.setItem(SCALE_KEY, String(pct)); } catch (e) {}
       }
+    }
+
+    function nudgeFontScale(delta) {
+      updateFontScale(currentScale + delta);
+    }
+
+    function initFontScale() {
+      let saved = 100;
+      try {
+        const v = localStorage.getItem(SCALE_KEY);
+        if (v !== null) saved = parseFloat(v);
+      } catch (e) {}
+      updateFontScale(saved, false);
     }
 
     function escapeHtml(str) {
@@ -796,6 +852,8 @@
         generateLabel();
       }
     }
+
+    initFontScale();
   </script>
 </body>
 </html>
