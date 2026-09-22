@@ -413,6 +413,13 @@
       user-select: all;
     }
 
+    /* ขยายขนาดเฉพาะบรรทัดปีพิมพ์ให้ดูหนาและได้สัดส่วนสมดุล */
+    .label-preview .year-num {
+      font-size: 1em;
+      font-weight: 800;
+      display: inline-block;
+    }
+
     #labelPreview[data-lines="1"],
     #labelPreview[data-lines="2"],
     #labelPreview[data-lines="3"] { line-height: 1.2; }
@@ -564,6 +571,12 @@
 
         page-break-inside: avoid !important;
         break-inside: avoid !important;
+      }
+
+      #labelPreview .year-num {
+        font-size: 1em !important;
+        font-weight: bold !important;
+        display: inline-block !important;
       }
 
       #labelPreview[data-lines="1"] { line-height: 1.2 !important; }
@@ -872,13 +885,15 @@
 
     function setPreview(text, isEmpty) {
       const el = document.getElementById('labelPreview');
-      el.innerText = text;
+      el.innerHTML = text;
       el.classList.toggle('is-empty', isEmpty);
       document.getElementById('labelFrame').classList.toggle('is-empty', isEmpty);
       document.getElementById('printBtn').disabled = isEmpty;
 
       if (!isEmpty) {
-        el.setAttribute('data-lines', text.split('\n').length);
+        // นับจำนวนบรรทัดโดยตัดแท็ก HTML ออกชั่วคราว
+        const cleanText = text.replace(/<[^>]*>/g, '');
+        el.setAttribute('data-lines', cleanText.split('\n').length);
       } else {
         el.removeAttribute('data-lines');
       }
@@ -1087,6 +1102,16 @@
         const rest = lines.slice(6).join(' ');
         lines = [...top6, rest];
       }
+
+      // หุ้มบรรทัดปีพิมพ์ด้วยแท็ก <span class="year-num"> เพื่อปรับขนาดและความหนาโดยเฉพาะ
+      lines = lines.map(line => {
+        const trimmed = line.trim();
+        const escaped = escapeHtml(trimmed);
+        if (/^[12]\d{3}(?:-(?:[12]\d{3}|\d{2}))?[a-zA-Z\u0E00-\u0E7F]?$/.test(trimmed)) {
+          return `<span class="year-num">${escaped}</span>`;
+        }
+        return escaped;
+      });
 
       setPreview(lines.join('\n'), false);
     }
