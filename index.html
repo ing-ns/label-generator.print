@@ -4,36 +4,35 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="color-scheme" content="light">
-  <title>ระบบสร้าง Label เลขเรียกหนังสือ (30x40 มม.)</title>
+  <title>ระบบสร้าง Label เลขเรียกหนังสือ</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #eef2f3;
+      --bg: #e9edee;
       --surface: #ffffff;
-      --ink: #1c282c;
-      --muted: #52636a;
-      --line: #e1e7e8;
-      --line-strong: #a4b3b6;
-      --track: #f1f5f5;
-      --field: #f8fafa;
+      --ink: #1e2a2f;
+      --muted: #465960;
+      --line: #e3e8e8;
+      --line-strong: #aebbbc;
+      --track: #eff2f2;
+      --field: #f7f9f9;
 
-      --accent: #256372;
-      --accent-strong: #17424d;
-      --accent-soft: rgba(37, 99, 114, 0.1);
+      --accent: #2a6f7e;
+      --accent-strong: #1a4b57;
+      --accent-soft: rgba(35, 94, 108, .11);
       --on-accent: #ffffff;
-      --ring: rgba(37, 99, 114, 0.28);
+      --ring: rgba(35, 94, 108, .30);
 
-      --stage: #f2f5f6;
-      --dash: #b9c7c9;
+      --stage: #f1f4f4;
+      --dash: #c5d1ce;
       --paper: #ffffff;
-      --paper-ink: #11181c;
-      --paper-line: #d3ddda;
+      --paper-ink: #18232a;
+      --paper-line: #d9e2df;
 
-      --shadow-card: 0 1px 3px rgba(15, 30, 35, 0.05), 0 10px 25px -12px rgba(15, 30, 35, 0.12);
-      --shadow-paper: 0 1px 2px rgba(15, 30, 35, 0.08), 0 8px 18px -8px rgba(15, 30, 35, 0.22);
+      --shadow-card: 0 1px 2px rgba(20, 40, 45, .04), 0 10px 28px -16px rgba(20, 40, 45, .14);
+      --shadow-paper: 0 1px 1px rgba(20, 40, 45, .06), 0 8px 20px -10px rgba(20, 40, 45, .25);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -49,26 +48,26 @@
     }
 
     .app {
-      max-width: 540px;
+      max-width: 520px;
       margin: 0 auto;
-      padding: 20px 16px 28px;
+      padding: 16px 16px 20px;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 10px;
     }
 
     /* ---------- Header ---------- */
     .app-header {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
       padding: 0 4px;
     }
 
     .app-mark {
-      width: 36px;
-      height: 36px;
-      border-radius: 10px;
+      width: 30px;
+      height: 30px;
+      border-radius: 9px;
       background: var(--accent-soft);
       color: var(--accent-strong);
       display: grid;
@@ -77,13 +76,12 @@
     }
 
     .app-header h1 {
-      font-size: 18px;
-      font-weight: 700;
+      font-size: 16px;
+      font-weight: 600;
       line-height: 1.3;
-      color: var(--ink);
     }
 
-    .app-mark svg.ico { width: 20px; height: 20px; }
+    .app-mark svg.ico { width: 17px; height: 17px; }
 
     svg.ico {
       width: 20px;
@@ -100,16 +98,81 @@
       background: var(--surface);
       border: 1px solid var(--line);
       border-radius: 16px;
-      padding: 16px;
+      padding: 14px 16px;
       box-shadow: var(--shadow-card);
     }
 
     .field-label {
       display: block;
-      font-size: 13px;
-      font-weight: 600;
+      font-size: 12.5px;
+      font-weight: 400;
+      color: #5f6f76;
+      margin-bottom: 6px;
+    }
+
+    /* ---------- Font scale ---------- */
+    .scale-panel {
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12.5px;
       color: var(--muted);
-      margin-bottom: 8px;
+    }
+
+    .scale-title { margin-right: auto; }
+
+    .scale-reset {
+      font: inherit;
+      font-size: 12.5px;
+      color: var(--accent-strong);
+      background: none;
+      border: 0;
+      padding: 2px 6px;
+      margin-right: 4px;
+      border-radius: 6px;
+      cursor: pointer;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+
+    .scale-reset.is-hidden { visibility: hidden; }
+
+    .step-btn {
+      width: 26px;
+      height: 26px;
+      display: grid;
+      place-items: center;
+      color: var(--muted);
+      background: transparent;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+    }
+
+    .step-btn svg.ico { width: 13px; height: 13px; stroke-width: 2.2; }
+
+    .step-btn:hover:not(:disabled) {
+      color: var(--accent-strong);
+      border-color: var(--accent);
+      background: var(--accent-soft);
+    }
+
+    .step-btn:disabled { opacity: .35; cursor: default; }
+
+    .step-btn:focus-visible,
+    .scale-reset:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .scale-value {
+      min-width: 3.6ch;
+      text-align: center;
+      font-weight: 500;
+      color: var(--ink);
+      font-variant-numeric: tabular-nums;
     }
 
     /* ---------- Segmented Control ---------- */
@@ -128,7 +191,7 @@
       background: var(--surface);
       border: 1px solid var(--line-strong);
       border-radius: 10px;
-      min-height: 40px;
+      min-height: 38px;
       padding: 6px 4px;
       display: flex;
       flex-direction: row;
@@ -138,10 +201,11 @@
       white-space: nowrap;
       text-align: center;
       cursor: pointer;
-      transition: all .15s ease;
+      transition: background-color .15s ease, color .15s ease, border-color .15s ease;
     }
 
-    .seg-btn svg.ico { width: 16px; height: 16px; flex: none; }
+    .seg-btn svg.ico { width: 17px; height: 17px; flex: none; }
+    .seg-btn .emoji-ico { font-size: 15px; line-height: 1; display: inline-block; }
 
     .seg-btn:hover:not(.active-mode) {
       border-color: var(--accent);
@@ -153,7 +217,7 @@
       border-color: var(--accent-strong);
       color: #ffffff;
       font-weight: 600;
-      box-shadow: 0 2px 4px rgba(20, 40, 45, 0.18);
+      box-shadow: 0 1px 3px rgba(20, 40, 45, .2);
     }
 
     .seg-btn:focus-visible,
@@ -169,17 +233,17 @@
     }
 
     .mode-hint {
-      margin-top: 8px;
+      margin-top: 6px;
       min-height: 19px;
-      font-size: 12.5px;
-      color: var(--muted);
+      font-size: 12px;
+      color: #66757b;
       padding-left: 2px;
     }
 
     /* ---------- Input Field ---------- */
     .entry {
-      margin-top: 10px;
-      padding-top: 12px;
+      margin-top: 8px;
+      padding-top: 10px;
       border-top: 1px solid var(--line);
     }
 
@@ -200,10 +264,10 @@
       border: 1px solid var(--line);
       border-radius: 11px;
       outline: none;
-      transition: all .15s ease;
+      transition: border-color .15s ease, box-shadow .15s ease, background-color .15s ease;
     }
 
-    #callNumberInput::placeholder { color: #809196; opacity: 1; font-size: 14.5px; }
+    #callNumberInput::placeholder { color: #5f6f76; opacity: 1; font-size: 15px; }
 
     #callNumberInput:focus {
       border-color: var(--accent);
@@ -229,20 +293,20 @@
     .btn-generate:active { transform: translateY(1px); }
 
     .key-hint {
-      margin-top: 8px;
-      font-size: 12.5px;
+      margin-top: 6px;
+      font-size: 13px;
       color: var(--muted);
       padding-left: 2px;
     }
 
     kbd {
       font: inherit;
-      font-size: 11.5px;
-      font-weight: 600;
-      padding: 1px 5px;
-      border: 1px solid var(--line-strong);
+      font-size: 12px;
+      font-weight: 500;
+      padding: 0 5px;
+      border: 1px solid var(--line);
       border-bottom-width: 2px;
-      border-radius: 5px;
+      border-radius: 6px;
       background: var(--field);
       color: var(--ink);
     }
@@ -253,12 +317,12 @@
       align-items: center;
       justify-content: space-between;
       gap: 10px;
-      margin-bottom: 12px;
+      margin-bottom: 8px;
     }
 
     .result-head h2 {
       font-size: 16px;
-      font-weight: 700;
+      font-weight: 600;
     }
 
     .btn-actions {
@@ -272,17 +336,17 @@
       display: inline-flex;
       align-items: center;
       gap: 7px;
-      height: 38px;
+      height: 36px;
       padding: 0 16px;
       font: inherit;
-      font-size: 14px;
+      font-size: 14.5px;
       font-weight: 600;
       color: var(--on-accent);
       background: var(--accent);
       border: 0;
       border-radius: 11px;
       cursor: pointer;
-      transition: all .15s ease;
+      transition: background-color .15s ease, transform .05s ease;
     }
 
     .btn-print svg.ico { width: 17px; height: 17px; }
@@ -291,21 +355,21 @@
     .btn-print:active:not(:disabled) { transform: translateY(1px); }
 
     .btn-print:disabled {
-      color: #8c9ba0;
+      color: #7d8b90;
       background: var(--track);
-      cursor: not-allowed;
+      cursor: default;
     }
 
     .stage {
       background: var(--stage);
       border-radius: 12px;
-      padding: 20px;
+      padding: 16px;
       display: flex;
       justify-content: center;
       align-items: center;
     }
 
-    /* กรอบ label 30x40 มม. ขยาย --k เท่า เพื่อความชัดเจนบนหน้าจอ */
+    /* กรอบ label 30x40 มม. ขยาย --k เท่า เพื่อให้เห็นชัดบนจอ */
     .label-frame {
       --k: 1.6;
       flex: none;
@@ -318,7 +382,6 @@
       border: 1px solid var(--paper-line);
       border-radius: 4px;
       box-shadow: var(--shadow-paper);
-      position: relative;
     }
 
     .label-frame.is-empty {
@@ -329,7 +392,7 @@
 
     .label-frame.is-over {
       outline: 2px solid #e2a04a;
-      outline-offset: 3px;
+      outline-offset: 2px;
     }
 
     /* ---------- หน้าจอพรีวิว ---------- */
@@ -350,17 +413,11 @@
       user-select: all;
     }
 
-    .label-preview .year-num {
-      font-size: 0.95em;
-      font-weight: 800;
-      display: inline-block;
-    }
-
     #labelPreview[data-lines="1"],
     #labelPreview[data-lines="2"],
     #labelPreview[data-lines="3"] { line-height: 1.2; }
-    #labelPreview[data-lines="4"] { line-height: 0.92; }
-    #labelPreview[data-lines="5"] { line-height: 0.78; }
+    #labelPreview[data-lines="4"] { line-height: 0.9; }
+    #labelPreview[data-lines="5"] { line-height: 0.77; }
     #labelPreview[data-lines="6"] { line-height: 0.7; }
     #labelPreview[data-lines="7"] { line-height: 0.65; }
 
@@ -379,83 +436,24 @@
 
     .raw-input-display {
       display: none;
-      margin-top: 10px;
+      margin-top: 8px;
       text-align: left;
       font-size: 13px;
       line-height: 1.4;
       color: var(--muted);
       word-break: break-word;
+      font-weight: normal;
     }
 
     .raw-input-display.show { display: block; }
     .raw-input-display span { font-weight: normal; margin-left: 2px; }
 
-    /* ---------- Font Scale Panel ---------- */
-    .scale-panel {
-      margin-top: 12px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 13px;
-      color: var(--muted);
-    }
-
-    .scale-title { margin-right: auto; font-weight: 500; }
-
-    .scale-reset {
-      font: inherit;
-      font-size: 12.5px;
-      font-weight: 500;
-      color: var(--accent-strong);
-      background: none;
-      border: 0;
-      padding: 2px 6px;
-      margin-right: 4px;
-      border-radius: 6px;
-      cursor: pointer;
-      text-decoration: underline;
-      text-underline-offset: 2px;
-    }
-
-    .scale-reset.is-hidden { visibility: hidden; }
-
-    .step-btn {
-      width: 28px;
-      height: 28px;
-      display: grid;
-      place-items: center;
-      color: var(--muted);
-      background: transparent;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all .15s ease;
-    }
-
-    .step-btn svg.ico { width: 14px; height: 14px; stroke-width: 2.2; }
-
-    .step-btn:hover:not(:disabled) {
-      color: var(--accent-strong);
-      border-color: var(--accent);
-      background: var(--accent-soft);
-    }
-
-    .step-btn:disabled { opacity: .35; cursor: default; }
-
-    .scale-value {
-      min-width: 4ch;
-      text-align: center;
-      font-weight: 600;
-      color: var(--ink);
-      font-variant-numeric: tabular-nums;
-    }
-
-    /* ---------- Warnings ---------- */
+    /* ---------- คำเตือน ---------- */
     .fit-warn[hidden], .font-note[hidden] { display: none; }
 
     .fit-warn {
       margin-top: 10px;
-      padding: 8px 12px;
+      padding: 8px 10px;
       display: flex;
       align-items: center;
       gap: 8px;
@@ -477,12 +475,14 @@
       color: inherit;
       background: none;
       border: 0;
-      padding: 2px 6px;
+      padding: 2px 4px;
       border-radius: 6px;
       text-decoration: underline;
       text-underline-offset: 2px;
       cursor: pointer;
     }
+
+    .fit-btn:focus-visible { outline: 2px solid #7a4300; outline-offset: 2px; }
 
     .font-note {
       margin-top: 8px;
@@ -567,17 +567,11 @@
         break-inside: avoid !important;
       }
 
-      #labelPreview .year-num {
-        font-size: 0.95em !important;
-        font-weight: bold !important;
-        display: inline-block !important;
-      }
-
       #labelPreview[data-lines="1"] { line-height: 1.2 !important; }
       #labelPreview[data-lines="2"] { line-height: 1.2 !important; }
       #labelPreview[data-lines="3"] { line-height: 1.2 !important; }
-      #labelPreview[data-lines="4"] { line-height: 0.92 !important; }
-      #labelPreview[data-lines="5"] { line-height: 0.78 !important; }
+      #labelPreview[data-lines="4"] { line-height: 0.9 !important; }
+      #labelPreview[data-lines="5"] { line-height: 0.77 !important; }
       #labelPreview[data-lines="6"] { line-height: 0.7 !important; }
       #labelPreview[data-lines="7"] { line-height: 0.65 !important; }
     }
@@ -617,7 +611,7 @@
           >
           <button type="button" class="btn-generate" onclick="generateLabel()">สร้าง</button>
         </div>
-        <p class="key-hint">กด <kbd>Enter</kbd> เพื่อสร้าง | <kbd>Alt</kbd> + <kbd>1-5</kbd> หรือ <kbd>Alt</kbd> + <kbd>←</kbd> <kbd>→</kbd> เปลี่ยนประเภท</p>
+        <p class="key-hint">กด <kbd>Enter</kbd> เพื่อสร้าง | <kbd>Alt</kbd> + <kbd>1-5</kbd> หรือ <kbd>Alt</kbd> + <kbd>←</kbd> <kbd>→</kbd> เปลี่ยนประเภทหนังสือ</p>
       </div>
     </section>
 
@@ -674,13 +668,7 @@
     const SCALE_KEY = 'labelFontScalePct';
     let currentScale = 100;
 
-    const MODE_HINTS = {
-      normal: 'รวมถึงนิยาย / การ์ตูน / DOC',
-      rare:   'เติม ก หรือ Ra',
-      ref:    'เติม อ หรือ R',
-      thesis: 'เติม วพ หรือ T',
-      acom:   'เติม ACOM'
-    };
+    const MODES = ['normal', 'rare', 'ref', 'thesis', 'acom'];
 
     function updateFontScale(percentVal, persist = true) {
       let pct = Math.round(parseFloat(percentVal));
@@ -703,6 +691,7 @@
       checkFit();
     }
 
+    /* ---------- ตรวจว่าข้อความล้นกรอบ label หรือไม่ ---------- */
     function labelFits() {
       const frame = document.getElementById('labelFrame');
       const el = document.getElementById('labelPreview');
@@ -753,64 +742,149 @@
       updateFontScale(currentScale);
     }
 
-
-    /**
-     * นับหน่วยตัวอักษร (Letter Units) ของ Cutter:
-     * - ตัวอักษรที่ติดกันโดยไม่มีตัวเลขกั้นกลาง (เช่น "WX", "JT", "AB", "ส")
-     *   นับเป็น 1 หน่วยนับตัวอักษร (1 Letter Unit)
-     */
-    function countLetterUnits(str) {
-      if (!str) return 0;
-      // ค้นหากลุ่มตัวอักษรภาษาอังกฤษหรือภาษาไทยที่ติดกันทั้งหมด
-      const matches = str.match(/[A-Za-z\u0E00-\u0E7F]+/g);
-      return matches ? matches.length : 0;
+    /* ---------- ตรวจว่ามีฟอนต์ Angsana New ในเครื่องหรือไม่ ---------- */
+    function hasLocalFont(name) {
+      const ctx = document.createElement('canvas').getContext('2d');
+      const sample = 'ทดสอบ Ra QA76.73 1234';
+      return ['monospace', 'serif', 'sans-serif'].some(base => {
+        ctx.font = '72px ' + base;
+        const baseW = ctx.measureText(sample).width;
+        ctx.font = '72px "' + name + '", ' + base;
+        return ctx.measureText(sample).width !== baseW;
+      });
     }
 
-    /**
-     * ตัดและรวมบรรทัด Cutter ตามเงื่อนไข:
-     * - นับตัวอักษรติดกันเป็น 1 หน่วย
-     * - ใน 1 บรรทัด รวมได้สูงสุดไม่เกิน 2 หน่วยนับตัวอักษร (Letter Units <= 2)
-     * ตัวอย่าง:
-     *   "JT3" (1 หน่วย) + "W64" (1 หน่วย) -> รวมเป็น "JT3W64" (2 หน่วย)
-     *   "JT3.3" (1 หน่วย) + "W88" (1 หน่วย) -> รวมเป็น "JT3.3W88" (2 หน่วย)
-     */
-    function parseCutters(rawCutterStr) {
-      if (!rawCutterStr) return [];
-      
-      // ดึงกลุ่ม Cutter แต่ละหน่วยออกมา (เช่น "JT3", "JT3.3", "W64", "W88")
-      const unitRegex = /[A-Za-z\u0E00-\u0E7F]+(?:\d+(?:\.\d+)?)*|\d+[A-Za-z\u0E00-\u0E7F]+/g;
-      const units = rawCutterStr.match(unitRegex) || [];
-      if (units.length === 0) return [];
+    function detectPrintFont() {
+      const ok = hasLocalFont('Angsana New') || hasLocalFont('AngsanaUPC');
+      document.getElementById('fontNote').hidden = ok;
+    }
 
-      const cutterLines = [];
-      let currentLine = '';
-      let currentUnitsCount = 0;
+    /* ---------- ระบบคีย์บอร์ดแบบครอบคลุมทั่วทั้งหน้าจอ ---------- */
+    function initKeyboardShortcuts() {
+      const group = document.querySelector('.segmented');
 
-      for (let unit of units) {
-        const uUnits = countLetterUnits(unit);
+      group.addEventListener('keydown', e => {
+        const btns = Array.from(group.querySelectorAll('.seg-btn'));
+        const activeIdx = btns.findIndex(b => b.dataset.mode === currentMode);
+        let next = activeIdx;
 
-        if (!currentLine) {
-          currentLine = unit;
-          currentUnitsCount = uUnits;
+        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+          next = (activeIdx + 1) % btns.length;
+        } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+          next = (activeIdx - 1 + btns.length) % btns.length;
+        } else if (e.key === 'Home') {
+          next = 0;
+        } else if (e.key === 'End') {
+          next = btns.length - 1;
         } else {
-          // หากรวมแล้วไม่เกิน 2 หน่วย ให้ต่อข้อความต่อท้ายในบรรทัดเดียวกันโดยไม่ต้องเว้นวรรค
-          if (currentUnitsCount + uUnits <= 2) {
-            currentLine += unit;
-            currentUnitsCount += uUnits;
-          } else {
-            cutterLines.push(currentLine);
-            currentLine = unit;
-            currentUnitsCount = uUnits;
+          return;
+        }
+
+        e.preventDefault();
+        setMode(btns[next].dataset.mode, true);
+      });
+
+      document.addEventListener('keydown', e => {
+        if (e.altKey && !e.ctrlKey && !e.shiftKey) {
+          const codeMap = {
+            'Digit1': 'normal', 'Numpad1': 'normal',
+            'Digit2': 'rare',   'Numpad2': 'rare',
+            'Digit3': 'ref',    'Numpad3': 'ref',
+            'Digit4': 'thesis', 'Numpad4': 'thesis',
+            'Digit5': 'acom',   'Numpad5': 'acom'
+          };
+
+          if (codeMap[e.code]) {
+            e.preventDefault();
+            setMode(codeMap[e.code], true);
+            return;
+          }
+
+          if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) {
+            const btns = Array.from(document.querySelectorAll('.seg-btn'));
+            const activeIdx = btns.findIndex(b => b.dataset.mode === currentMode);
+            let next = activeIdx;
+
+            if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+              next = (activeIdx + 1) % btns.length;
+            } else {
+              next = (activeIdx - 1 + btns.length) % btns.length;
+            }
+
+            e.preventDefault();
+            setMode(btns[next].dataset.mode, true);
           }
         }
-      }
-      if (currentLine) {
-        cutterLines.push(currentLine);
-      }
-
-      return cutterLines;
+      });
     }
 
+    function nudgeFontScale(delta) {
+      updateFontScale(currentScale + delta);
+    }
+
+    function initFontScale() {
+      let saved = 100;
+      try {
+        const v = localStorage.getItem(SCALE_KEY);
+        if (v !== null) saved = parseFloat(v);
+      } catch (e) {}
+      updateFontScale(saved, false);
+    }
+
+    function escapeHtml(str) {
+      return str
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    const MODE_HINTS = {
+      normal: 'รวมถึงนิยาย / การ์ตูน / DOC',
+      rare:   'เติม ก หรือ Ra',
+      ref:    'เติม อ หรือ R',
+      thesis: 'เติม วพ หรือ T',
+      acom:   'เติม ACOM'
+    };
+
+    function setMode(mode, returnFocusToInput = false) {
+      currentMode = mode;
+      document.querySelectorAll('.seg-btn').forEach(btn => {
+        const on = btn.dataset.mode === mode;
+        btn.classList.toggle('active-mode', on);
+        btn.setAttribute('aria-checked', on ? 'true' : 'false');
+        btn.tabIndex = on ? 0 : -1;
+        if (on && !returnFocusToInput) btn.focus();
+      });
+      document.getElementById('modeHint').textContent = MODE_HINTS[mode] || '';
+
+      const inputEl = document.getElementById('callNumberInput');
+      if (inputEl.value.trim() || lastRawInput) {
+        generateLabel(true);
+      }
+
+      if (returnFocusToInput && inputEl) {
+        inputEl.focus();
+      }
+    }
+
+    function setPreview(text, isEmpty) {
+      const el = document.getElementById('labelPreview');
+      el.innerHTML = text;
+      el.classList.toggle('is-empty', isEmpty);
+      document.getElementById('labelFrame').classList.toggle('is-empty', isEmpty);
+      document.getElementById('printBtn').disabled = isEmpty;
+
+      if (!isEmpty) {
+        const cleanText = text.replace(/<[^>]*>/g, '');
+        el.setAttribute('data-lines', cleanText.split('\n').length);
+      } else {
+        el.removeAttribute('data-lines');
+      }
+
+      checkFit();
+    }
 
     function hasThai(str) {
       return /[\u0E00-\u0E7F]/i.test(str);
@@ -824,6 +898,50 @@
       if (mode === 'ref') return isThai ? 'อ' : 'R';
       if (mode === 'thesis') return isThai ? 'วพ' : 'T';
       return null;
+    }
+
+    // นับกลุ่มตัวอักษรที่ติดกันเป็น 1 หน่วยนับ (Letter Units Rule)
+    function countLetterUnits(str) {
+      const matches = str.match(/[A-Za-z\u0E00-\u0E7F]+/g);
+      return matches ? matches.length : 0;
+    }
+
+    function parseCutters(rawCutterStr) {
+      if (!rawCutterStr) return [];
+      
+      const matches = rawCutterStr.match(/\.?[A-Za-z\u0E00-\u0E7F]+\d*(?:\.\d+)*[A-Za-z\u0E00-\u0E7F]*\d*/g);
+      if (!matches) {
+        const fallback = rawCutterStr.replace(/\./g, ' ').trim().split(/\s+/).filter(Boolean);
+        return fallback;
+      }
+
+      const cutterLines = [];
+      let currentLine = '';
+      let currentUnitCount = 0;
+
+      for (let rawToken of matches) {
+        const token = rawToken.replace(/^\./, '').trim();
+        if (!token) continue;
+
+        const unitLetters = countLetterUnits(token);
+
+        if (!currentLine) {
+          currentLine = token;
+          currentUnitCount = unitLetters;
+        } else {
+          if (currentUnitCount + unitLetters <= 2) {
+            currentLine += token;
+            currentUnitCount += unitLetters;
+          } else {
+            cutterLines.push(currentLine);
+            currentLine = token;
+            currentUnitCount = unitLetters;
+          }
+        }
+      }
+      if (currentLine) cutterLines.push(currentLine);
+
+      return cutterLines;
     }
 
     function generateLabel(fromModeChange = false) {
@@ -857,7 +975,6 @@
 
       let lines = [];
 
-      // รองรับหนังสือกลุ่ม CRE
       if (/CRE/i.test(str)) {
         let clean = str.replace(/^(Ra|ก|อ|R|วพ|T|ACOM)\s+/i, '').replace(/^CRE\s+/i, '').trim();
         const tokens = clean.split(/\s+/).filter(t => t.length > 0);
@@ -869,7 +986,12 @@
           else volParts.push(t);
         }
 
-        lines = [currentMode === 'acom' ? 'ACOM' : 'Ra', 'CRE'];
+        if (currentMode === 'acom') {
+          lines = ['ACOM', 'CRE'];
+        } else {
+          lines = ['Ra', 'CRE'];
+        }
+
         if (year) lines.push(year);
         if (accession) lines.push(accession);
         if (volParts.length > 0) lines.push(volParts.join(' '));
@@ -877,7 +999,6 @@
         const prefixLine = getPrefixForMode(currentMode, str);
         str = str.replace(/^(Ra|ก|อ|R|วพ|T|ACOM)\s+/i, '');
 
-        // กรณีเป็นหมวด นิยาย / การ์ตูน
         const ficMatch = str.match(/^(นว|Fic|กต|Comic)[\s\.]*/i);
         let ficPrefix = null;
         if (ficMatch) {
@@ -885,7 +1006,6 @@
           str = str.substring(ficMatch[0].length).trim();
         }
 
-        // แยก Class Prefix และ Class Number (เช่น WX 27 หรือ QA 76.73)
         let classPrefix = '', classNum = '';
         if (!ficPrefix) {
           const classMatch = str.match(/^([A-Za-z\u0E00-\u0E7F]+)\s*(\d+(?:\.\d+)?)/);
@@ -896,7 +1016,6 @@
           }
         }
 
-        // Pattern สำหรับการค้นหาปีพิมพ์และเดือน
         const monthRegexStr = `(?:ม\\.ค\\.?|ก\\.พ\\.?|มี\\.ค\\.?|เม\\.ย\\.?|พ\\.ค\\.?|มิ\\.ย\\.?|ก\\.ค\\.?|ส\\.ค\\.?|ก\\.ย\\.?|ต\\.ค\\.?|พ\\.ย\\.?|ธ\\.ค\\.?|มกราคม|กุมภาพันธ์|มีนาคม|เมษายน|พฤษภาคม|มิถุนายน|กรกฎาคม|สิงหาคม|กันยายน|ตุลาคม|พฤศจิกายน|ธันวาคม|Jan[a-zA-Z]*\\.?|Feb[a-zA-Z]*\\.?|Mar[a-zA-Z]*\\.?|Apr[a-zA-Z]*\\.?|May[a-zA-Z]*\\.?|Jun[a-zA-Z]*\\.?|Jul[a-zA-Z]*\\.?|Aug[a-zA-Z]*\\.?|Sep[a-zA-Z]*\\.?|Sept[a-zA-Z]*\\.?|Oct[a-zA-Z]*\\.?|Nov[a-zA-Z]*\\.?|Dec[a-zA-Z]*\\.?)`;
         const yearRegexStr = `(?:[12]\\d{3}(?:-(?:[12]\\d{3}|\\d{2}))?(?:[a-zA-Z\\u0E00-\\u0E7F](?![a-zA-Z\\u0E00-\\u0E7F]))?)`;
 
@@ -953,7 +1072,6 @@
           }
         }
 
-        // ประมวลผลกลุ่ม Cutter ตามกฎ Letter Unit <= 2
         const cutterLines = parseCutters(cutterStr);
 
         if (prefixLine) lines.push(prefixLine);
@@ -975,56 +1093,9 @@
         lines = [...top6, rest];
       }
 
-      // หุ้มบรรทัดปีพิมพ์ด้วยแท็ก <span class="year-num"> เพื่อเน้นความหนาและสัดส่วน
-      lines = lines.map(line => {
-        const trimmed = line.trim();
-        const escaped = escapeHtml(trimmed);
-        if (/^[12]\d{3}(?:-(?:[12]\d{3}|\d{2}))?[a-zA-Z\u0E00-\u0E7F]?$/.test(trimmed)) {
-          return `<span class="year-num">${escaped}</span>`;
-        }
-        return escaped;
-      });
+      lines = lines.map(line => escapeHtml(line.trim()));
 
       setPreview(lines.join('\n'), false);
-    }
-
-
-    function setPreview(text, isEmpty) {
-      const el = document.getElementById('labelPreview');
-      el.innerHTML = text;
-      el.classList.toggle('is-empty', isEmpty);
-      document.getElementById('labelFrame').classList.toggle('is-empty', isEmpty);
-      document.getElementById('printBtn').disabled = isEmpty;
-
-      if (!isEmpty) {
-        const cleanText = text.replace(/<[^>]*>/g, '');
-        el.setAttribute('data-lines', cleanText.split('\n').length);
-      } else {
-        el.removeAttribute('data-lines');
-      }
-
-      checkFit();
-    }
-
-    function setMode(mode, returnFocusToInput = false) {
-      currentMode = mode;
-      document.querySelectorAll('.seg-btn').forEach(btn => {
-        const on = btn.dataset.mode === mode;
-        btn.classList.toggle('active-mode', on);
-        btn.setAttribute('aria-checked', on ? 'true' : 'false');
-        btn.tabIndex = on ? 0 : -1;
-        if (on && !returnFocusToInput) btn.focus();
-      });
-      document.getElementById('modeHint').textContent = MODE_HINTS[mode] || '';
-
-      const inputEl = document.getElementById('callNumberInput');
-      if (inputEl.value.trim() || lastRawInput) {
-        generateLabel(true);
-      }
-
-      if (returnFocusToInput && inputEl) {
-        inputEl.focus();
-      }
     }
 
     function handleKeyDown(event) {
@@ -1034,93 +1105,6 @@
       }
     }
 
-    function initKeyboardShortcuts() {
-      const group = document.querySelector('.segmented');
-
-      group.addEventListener('keydown', e => {
-        const btns = Array.from(group.querySelectorAll('.seg-btn'));
-        const activeIdx = btns.findIndex(b => b.dataset.mode === currentMode);
-        let next = activeIdx;
-
-        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') next = (activeIdx + 1) % btns.length;
-        else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') next = (activeIdx - 1 + btns.length) % btns.length;
-        else if (e.key === 'Home') next = 0;
-        else if (e.key === 'End') next = btns.length - 1;
-        else return;
-
-        e.preventDefault();
-        setMode(btns[next].dataset.mode, true);
-      });
-
-      document.addEventListener('keydown', e => {
-        if (e.altKey && !e.ctrlKey && !e.shiftKey) {
-          const codeMap = {
-            'Digit1': 'normal', 'Numpad1': 'normal',
-            'Digit2': 'rare',   'Numpad2': 'rare',
-            'Digit3': 'ref',    'Numpad3': 'ref',
-            'Digit4': 'thesis', 'Numpad4': 'thesis',
-            'Digit5': 'acom',   'Numpad5': 'acom'
-          };
-
-          if (codeMap[e.code]) {
-            e.preventDefault();
-            setMode(codeMap[e.code], true);
-            return;
-          }
-
-          if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) {
-            const btns = Array.from(document.querySelectorAll('.seg-btn'));
-            const activeIdx = btns.findIndex(b => b.dataset.mode === currentMode);
-            let next = (e.key === 'ArrowRight' || e.key === 'ArrowDown')
-              ? (activeIdx + 1) % btns.length
-              : (activeIdx - 1 + btns.length) % btns.length;
-
-            e.preventDefault();
-            setMode(btns[next].dataset.mode, true);
-          }
-        }
-      });
-    }
-
-    function nudgeFontScale(delta) {
-      updateFontScale(currentScale + delta);
-    }
-
-    function initFontScale() {
-      let saved = 100;
-      try {
-        const v = localStorage.getItem(SCALE_KEY);
-        if (v !== null) saved = parseFloat(v);
-      } catch (e) {}
-      updateFontScale(saved, false);
-    }
-
-    function escapeHtml(str) {
-      return str
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-    }
-
-    function hasLocalFont(name) {
-      const ctx = document.createElement('canvas').getContext('2d');
-      const sample = 'ทดสอบ Ra QA76.73 1234';
-      return ['monospace', 'serif', 'sans-serif'].some(base => {
-        ctx.font = '72px ' + base;
-        const baseW = ctx.measureText(sample).width;
-        ctx.font = '72px "' + name + '", ' + base;
-        return ctx.measureText(sample).width !== baseW;
-      });
-    }
-
-    function detectPrintFont() {
-      const ok = hasLocalFont('Angsana New') || hasLocalFont('AngsanaUPC');
-      document.getElementById('fontNote').hidden = ok;
-    }
-
-    // เริ่มการทำงานระบบ
     initFontScale();
     initKeyboardShortcuts();
     detectPrintFont();
