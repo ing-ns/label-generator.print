@@ -410,6 +410,9 @@
       color: var(--paper-ink);
       user-select: all;
     }
+    .label-preview .year-line {
+    font-size: 0.95em;
+    }
 
     #labelPreview[data-lines="1"],
     #labelPreview[data-lines="2"],
@@ -1005,7 +1008,7 @@
           lines = ['Ra', 'CRE'];
         }
 
-        if (year) lines.push(year);
+        if (year) lines.push('<span class="year-line">' + escapeHtml(year) + '</span>');
         if (accession) lines.push(accession);
         if (volParts.length > 0) lines.push(volParts.join(' '));
       } else {
@@ -1095,7 +1098,7 @@
           if (classNum) lines.push(classNum);
         }
         lines.push(...cutterLines);
-        if (year) lines.push(year);
+        if (year) lines.push('<span class="year-line">' + escapeHtml(year) + '</span>');
         if (monthStr) lines.push(monthStr);
         lines.push(...volPartLines);
       }
@@ -1106,7 +1109,7 @@
         lines = [...top6, rest];
       }
 
-      lines = lines.map(line => escapeHtml(line.trim()));
+      lines = lines.map(line => line.includes('class="year-line"') ? line : escapeHtml(line.trim()));
 
       setPreview(lines.join('\n'), false);
     }
