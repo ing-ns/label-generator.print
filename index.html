@@ -178,7 +178,7 @@
     /* ---------- Segmented Control ---------- */
     .segmented {
       display: grid;
-      grid-template-columns: repeat(5, 1fr);
+      grid-template-columns: repeat(4, 1fr);
       gap: 6px;
     }
 
@@ -205,7 +205,6 @@
     }
 
     .seg-btn svg.ico { width: 17px; height: 17px; flex: none; }
-    .seg-btn .emoji-ico { font-size: 15px; line-height: 1; display: inline-block; }
 
     .seg-btn:hover:not(.active-mode) {
       border-color: var(--accent);
@@ -228,7 +227,7 @@
     }
 
     @media (max-width: 519px) {
-      .segmented { grid-template-columns: repeat(3, 1fr); }
+      .segmented { grid-template-columns: repeat(2, 1fr); }
       .seg-btn { min-height: 42px; }
     }
 
@@ -369,7 +368,6 @@
       align-items: center;
     }
 
-    /* กรอบ label 30x40 มม. ขยาย --k เท่า เพื่อให้เห็นชัดบนจอ */
     .label-frame {
       --k: 1.6;
       flex: none;
@@ -395,7 +393,7 @@
       outline-offset: 2px;
     }
 
-    /* ---------- หน้าจอพรีวิว ---------- */
+    /* ---------- Preview ---------- */
     .label-preview {
       --font-scale: 1;
       display: inline-block;
@@ -448,7 +446,7 @@
     .raw-input-display.show { display: block; }
     .raw-input-display span { font-weight: normal; margin-left: 2px; }
 
-    /* ---------- คำเตือน ---------- */
+    /* ---------- Warnings ---------- */
     .fit-warn[hidden], .font-note[hidden] { display: none; }
 
     .fit-warn {
@@ -491,9 +489,7 @@
       color: #7a4300;
     }
 
-    /* ========================================================= */
-    /*   การตั้งค่าพิมพ์: 3x4 ซม. Angsana New จัดกึ่งกลางสมบูรณ์   */
-    /* ========================================================= */
+    /* ---------- Print Styles ---------- */
     @media print {
       @page {
         size: 30mm 40mm;
@@ -595,6 +591,9 @@
         <button type="button" class="seg-btn" data-mode="ref" role="radio" aria-checked="false" tabindex="-1" onclick="setMode('ref', true)"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg><span>อ้างอิง</span></button>
         <button type="button" class="seg-btn" data-mode="thesis" role="radio" aria-checked="false" tabindex="-1" onclick="setMode('thesis', true)"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg><span>วพ</span></button>
         <button type="button" class="seg-btn" data-mode="acom" role="radio" aria-checked="false" tabindex="-1" onclick="setMode('acom', true)"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/></svg><span>ACOM</span></button>
+        <button type="button" class="seg-btn" data-mode="rew" role="radio" aria-checked="false" tabindex="-1" onclick="setMode('rew', true)"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><span>Rew</span></button>
+        <button type="button" class="seg-btn" data-mode="z" role="radio" aria-checked="false" tabindex="-1" onclick="setMode('z', true)"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 8h8l-8 8h8"/></svg><span>Z</span></button>
+        <button type="button" class="seg-btn" data-mode="ks" role="radio" aria-checked="false" tabindex="-1" onclick="setMode('ks', true)"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg><span>คส</span></button>
       </div>
       <p class="mode-hint" id="modeHint">รวมถึงนิยาย / การ์ตูน / DOC</p>
 
@@ -611,7 +610,7 @@
           >
           <button type="button" class="btn-generate" onclick="generateLabel()">สร้าง</button>
         </div>
-        <p class="key-hint">กด <kbd>Enter</kbd> เพื่อสร้าง | <kbd>Alt</kbd> + <kbd>1-5</kbd> หรือ <kbd>Alt</kbd> + <kbd>←</kbd> <kbd>→</kbd> เปลี่ยนประเภทหนังสือ</p>
+        <p class="key-hint">กด <kbd>Enter</kbd> เพื่อสร้าง | <kbd>Alt</kbd> + <kbd>1-8</kbd> หรือ <kbd>Alt</kbd> + <kbd>←</kbd> <kbd>→</kbd> เปลี่ยนประเภทหนังสือ</p>
       </div>
     </section>
 
@@ -668,7 +667,7 @@
     const SCALE_KEY = 'labelFontScalePct';
     let currentScale = 100;
 
-    const MODES = ['normal', 'rare', 'ref', 'thesis', 'acom'];
+    const MODES = ['normal', 'rare', 'ref', 'thesis', 'acom', 'rew', 'z', 'ks'];
 
     function updateFontScale(percentVal, persist = true) {
       let pct = Math.round(parseFloat(percentVal));
@@ -691,7 +690,6 @@
       checkFit();
     }
 
-    /* ---------- ตรวจว่าข้อความล้นกรอบ label หรือไม่ ---------- */
     function labelFits() {
       const frame = document.getElementById('labelFrame');
       const el = document.getElementById('labelPreview');
@@ -742,7 +740,6 @@
       updateFontScale(currentScale);
     }
 
-    /* ---------- ตรวจว่ามีฟอนต์ Angsana New ในเครื่องหรือไม่ ---------- */
     function hasLocalFont(name) {
       const ctx = document.createElement('canvas').getContext('2d');
       const sample = 'ทดสอบ Ra QA76.73 1234';
@@ -759,7 +756,6 @@
       document.getElementById('fontNote').hidden = ok;
     }
 
-    /* ---------- ระบบคีย์บอร์ดแบบครอบคลุมทั่วทั้งหน้าจอ ---------- */
     function initKeyboardShortcuts() {
       const group = document.querySelector('.segmented');
 
@@ -791,7 +787,10 @@
             'Digit2': 'rare',   'Numpad2': 'rare',
             'Digit3': 'ref',    'Numpad3': 'ref',
             'Digit4': 'thesis', 'Numpad4': 'thesis',
-            'Digit5': 'acom',   'Numpad5': 'acom'
+            'Digit5': 'acom',   'Numpad5': 'acom',
+            'Digit6': 'rew',    'Numpad6': 'rew',
+            'Digit7': 'z',      'Numpad7': 'z',
+            'Digit8': 'ks',     'Numpad8': 'ks'
           };
 
           if (codeMap[e.code]) {
@@ -845,7 +844,10 @@
       rare:   'เติม ก หรือ Ra',
       ref:    'เติม อ หรือ R',
       thesis: 'เติม วพ หรือ T',
-      acom:   'เติม ACOM'
+      acom:   'เติม ACOM',
+      rew:    'เติม Rew',
+      z:      'เติม Z',
+      ks:     'เติม คส'
     };
 
     function setMode(mode, returnFocusToInput = false) {
@@ -893,6 +895,9 @@
     function getPrefixForMode(mode, inputStr) {
       if (mode === 'normal') return null;
       if (mode === 'acom') return 'ACOM';
+      if (mode === 'rew') return 'Rew';
+      if (mode === 'z') return 'Z';
+      if (mode === 'ks') return 'คส';
       const isThai = hasThai(inputStr);
       if (mode === 'rare') return isThai ? 'ก' : 'Ra';
       if (mode === 'ref') return isThai ? 'อ' : 'R';
@@ -900,7 +905,6 @@
       return null;
     }
 
-    // นับกลุ่มตัวอักษรที่ติดกันเป็น 1 หน่วยนับ (Letter Units Rule)
     function countLetterUnits(str) {
       const matches = str.match(/[A-Za-z\u0E00-\u0E7F]+/g);
       return matches ? matches.length : 0;
@@ -973,10 +977,13 @@
 
       inputEl.value = '';
 
+      // ตัดสัญลักษณ์ ▼ ตามด้วยตัวอักษร/ตัวเลข เช่น ▼b ออกอัตโนมัติ
+      str = str.replace(/▼[a-zA-Z0-9\u0E00-\u0E7F]/g, '');
+
       let lines = [];
 
       if (/CRE/i.test(str)) {
-        let clean = str.replace(/^(Ra|ก|อ|R|วพ|T|ACOM)\s+/i, '').replace(/^CRE\s+/i, '').trim();
+        let clean = str.replace(/^(Ra|ก|อ|R|วพ|T|ACOM|Rew|Z|คส)\s+/i, '').replace(/^CRE\s+/i, '').trim();
         const tokens = clean.split(/\s+/).filter(t => t.length > 0);
         let year = '', accession = '', volParts = [];
 
@@ -988,6 +995,12 @@
 
         if (currentMode === 'acom') {
           lines = ['ACOM', 'CRE'];
+        } else if (currentMode === 'rew') {
+          lines = ['Rew', 'CRE'];
+        } else if (currentMode === 'z') {
+          lines = ['Z', 'CRE'];
+        } else if (currentMode === 'ks') {
+          lines = ['คส', 'CRE'];
         } else {
           lines = ['Ra', 'CRE'];
         }
@@ -997,7 +1010,7 @@
         if (volParts.length > 0) lines.push(volParts.join(' '));
       } else {
         const prefixLine = getPrefixForMode(currentMode, str);
-        str = str.replace(/^(Ra|ก|อ|R|วพ|T|ACOM)\s+/i, '');
+        str = str.replace(/^(Ra|ก|อ|R|วพ|T|ACOM|Rew|Z|คส)\s+/i, '');
 
         const ficMatch = str.match(/^(นว|Fic|กต|Comic)[\s\.]*/i);
         let ficPrefix = null;
