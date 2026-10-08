@@ -598,7 +598,7 @@
         <button type="button" class="seg-btn" data-mode="z" role="radio" aria-checked="false" tabindex="-1" onclick="setMode('z', true)"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 8h8l-8 8h8"/></svg><span>Z</span></button>
         <button type="button" class="seg-btn" data-mode="ks" role="radio" aria-checked="false" tabindex="-1" onclick="setMode('ks', true)"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg><span>คส</span></button>
       </div>
-      <p class="mode-hint" id="modeHint">รวมถึงนิยาย / การ์ตูน / DOC</p>
+      <p class="mode-hint" id="modeHint">รวมถึงนิยาย / การ์ตูน / DOC / CRE</p>
 
       <div class="entry">
         <label class="field-label" for="callNumberInput">เลขเรียกหนังสือ</label>
@@ -606,7 +606,7 @@
           <input
             type="text"
             id="callNumberInput"
-            placeholder="กรอกเลขเรียกหนังสือที่นี่"
+            placeholder="กรอกเลขเรียกหนังสือที่นี่ (เช่น CRE 2017 699504)"
             autocomplete="off"
             onkeydown="handleKeyDown(event)"
             autofocus
@@ -843,7 +843,7 @@
     }
 
     const MODE_HINTS = {
-      normal: 'รวมถึงนิยาย / การ์ตูน / DOC',
+      normal: 'รวมถึงนิยาย / การ์ตูน / DOC / CRE',
       rare:   'หนังสือหายาก (Rare Book)',
       ref:    'หนังสืออ้างอิง (Reference Book)',
       thesis: 'วิทยานิพนธ์ (Thesis)',
@@ -978,22 +978,41 @@
       inputEl.value = '';
 
       // ตัดสัญลักษณ์ MARC Delimiter (เช่น ▼a, $a, ‡a) ออกอัตโนมัติ
-      str = str.replace(/[▼$‡|][a-zA-Z0-9\u0E00-\u0E7F]/g, ' ');
+      str = str.replace(/[▼$‡|][a-zA-Z0-9\u0E00-\u0E7F]/g, ' ').trim();
 
       let lines = [];
 
+      // กรณีมีคำว่า CRE หรือขึ้นต้นด้วย CRE
       if (/CRE/i.test(str)) {
-        let clean = str.replace(/^(Ra|ก|อ|R|วพ|T|ACOM|Rew|Z|คส)\s+/i, '').replace(/^CRE\s+/i, '').trim();
-        const tokens = clean.split(/\s+/).filter(t => t.length > 0);
+        // ทำความสะอาดข้อความ ตัด Prefix เดิมและคำว่า CRE ออก
+        let clean = str
+          .replace(/^(Ra|ก|อ|R|วพ|T|ACOM|Rew|Z|คส)\s+/i, '')
+          .replace(/^CRE[\s\.\/\:]*/i, '')
+          .replace(/[\s\.\/\:]*CRE[\s\.\/\:]*/i, ' ')
+          .trim();
+
+        // แยกส่วนประกอบย่อยของ CRE (ปีพิมพ์, เลขทะเบียน, เล่ม/ฉบับ)
+        const tokens = clean.split(/[\s\/]+/).filter(t => t.length > 0);
         let year = '', accession = '', volParts = [];
 
         for (let t of tokens) {
-          if (!year && /^[12]\d{3}(?:-(?:[12]\d{3}|\d{2}))?$/.test(t)) year = t;
-          else if (!accession && /^\d+$/.test(t)) accession = t;
-          else volParts.push(t);
+          if (!year && /^[12]\d{3}(?:-(?:[12]\d{3}|\d{2}))?$/.test(t)) {
+            year = t;
+          } else if (!accession && /^\d+$/.test(t)) {
+            accession = t;
+          } else {
+            volParts.push(t);
+          }
         }
 
-        const prefix = getPrefixForMode(currentMode, str);
+        // สำหรับประเภท "ทั่วไป / CRE" (normal) และ "หายาก" (rare) ให้เพิ่ม Ra เป็นบรรทัดบนสุดเสมอ
+        let prefix = null;
+        if (currentMode === 'normal' || currentMode === 'rare') {
+          prefix = 'Ra';
+        } else {
+          prefix = getPrefixForMode(currentMode, str);
+        }
+
         lines = prefix ? [prefix, 'CRE'] : ['CRE'];
 
         if (year) lines.push('<span class="year-line">' + escapeHtml(year) + '</span>');
