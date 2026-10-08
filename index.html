@@ -1128,11 +1128,15 @@
         }
 
         if (!year && !monthStr && volPartLines.length === 0) {
-          const volPartMatch = preCutterAndCutterStr.match(/(?:\s+|^)((?:ล\.|เล่ม|v\.|V\.|c\.|C\.|bd\.|vol\.|Vol\.|ฉ\.|ต\.|ตอน|pt\.|Pt\.|part|Part|ค\.)\s*\d+.*)$/i);
+          const volPartRegexGlobal = /(?:ล\.|เล่ม|v\.|V\.|c\.|C\.|bd\.|vol\.|Vol\.|ฉ\.|ต\.|ตอน|pt\.|Pt\.|part|Part|ค\.)\s*\d+[a-zA-Z\u0E00-\u0E7F]*/gi;
+          const volPartMatch = preCutterAndCutterStr.match(/(?:\s+|^)((?:(?:ล\.|เล่ม|v\.|V\.|c\.|C\.|bd\.|vol\.|Vol\.|ฉ\.|ต\.|ตอน|pt\.|Pt\.|part|Part|ค\.)\s*\d+[a-zA-Z\u0E00-\u0E7F]*\s*)+)$/i);
           if (volPartMatch) {
-            const matchedVol = volPartMatch[1].trim();
-            volPartLines = [matchedVol];
-            preCutterAndCutterStr = preCutterAndCutterStr.substring(0, volPartMatch.index).trim();
+            const fullVolStr = volPartMatch[1].trim();
+            const matches = fullVolStr.match(volPartRegexGlobal);
+            if (matches) {
+              volPartLines = matches.map(v => v.trim());
+              preCutterAndCutterStr = preCutterAndCutterStr.substring(0, volPartMatch.index).trim();
+            }
           }
         }
 
