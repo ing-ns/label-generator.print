@@ -411,7 +411,7 @@
       user-select: all;
     }
     .label-preview .year-line {
-    font-size: 1.03em;
+      font-size: 1.03em;
     }
 
     #labelPreview[data-lines="1"],
@@ -908,45 +908,42 @@
       return null;
     }
 
-    function countLetterUnits(str) {
-      const matches = str.match(/[A-Za-z\u0E00-\u0E7F]+/g);
-      return matches ? matches.length : 0;
-    }
-
     function parseCutters(rawCutterStr) {
       if (!rawCutterStr) return [];
-      
-      const matches = rawCutterStr.match(/\.?[A-Za-z\u0E00-\u0E7F]+\d*(?:\.\d+)*[A-Za-z\u0E00-\u0E7F]*\d*/g);
-      if (!matches) {
-        const fallback = rawCutterStr.replace(/\./g, ' ').trim().split(/\s+/).filter(Boolean);
-        return fallback;
+
+      const cutterRegex = /\.?[A-Za-z\u0E00-\u0E7F]+\d+(?:[A-Za-z\u0E00-\u0E7F](?![0-9]))?/g;
+      let matches = rawCutterStr.match(cutterRegex);
+
+      if (!matches || matches.length === 0) {
+        matches = rawCutterStr.replace(/\./g, ' ').trim().split(/\s+/).filter(Boolean);
       }
 
       const cutterLines = [];
       let currentLine = '';
-      let currentUnitCount = 0;
+      let currentCount = 0;
 
       for (let rawToken of matches) {
         const token = rawToken.replace(/^\./, '').trim();
         if (!token) continue;
 
-        const unitLetters = countLetterUnits(token);
-
         if (!currentLine) {
           currentLine = token;
-          currentUnitCount = unitLetters;
+          currentCount = 1;
         } else {
-          if (currentUnitCount + unitLetters <= 2) {
+          if (currentCount + 1 <= 2) {
             currentLine += token;
-            currentUnitCount += unitLetters;
+            currentCount += 1;
           } else {
             cutterLines.push(currentLine);
             currentLine = token;
-            currentUnitCount = unitLetters;
+            currentCount = 1;
           }
         }
       }
-      if (currentLine) cutterLines.push(currentLine);
+
+      if (currentLine) {
+        cutterLines.push(currentLine);
+      }
 
       return cutterLines;
     }
@@ -980,8 +977,8 @@
 
       inputEl.value = '';
 
-      // ตัดสัญลักษณ์ ▼ ตามด้วยตัวอักษร/ตัวเลข เช่น ▼b ออกอัตโนมัติ
-      str = str.replace(/▼[a-zA-Z0-9\u0E00-\u0E7F]/g, '');
+      // ตัดสัญลักษณ์ MARC Delimiter (เช่น ▼a, $a, ‡a) ออกอัตโนมัติ
+      str = str.replace(/[▼$‡|][a-zA-Z0-9\u0E00-\u0E7F]/g, ' ');
 
       let lines = [];
 
@@ -996,17 +993,8 @@
           else volParts.push(t);
         }
 
-        if (currentMode === 'acom') {
-          lines = ['ACOM', 'CRE'];
-        } else if (currentMode === 'rew') {
-          lines = ['Rew', 'CRE'];
-        } else if (currentMode === 'z') {
-          lines = ['Z', 'CRE'];
-        } else if (currentMode === 'ks') {
-          lines = ['คส', 'CRE'];
-        } else {
-          lines = ['Ra', 'CRE'];
-        }
+        const prefix = getPrefixForMode(currentMode, str);
+        lines = prefix ? [prefix, 'CRE'] : ['CRE'];
 
         if (year) lines.push('<span class="year-line">' + escapeHtml(year) + '</span>');
         if (accession) lines.push(accession);
@@ -1029,28 +1017,65 @@
             classPrefix = classMatch[1];
             classNum = classMatch[2];
             str = str.substring(classMatch[0].length).trim();
+          } else {
+            const deweyMatch = str.match(/^(\d{3}(?:\.\d+)?)/);
+            if (deweyMatch) {
+              classNum = deweyMatch[1];
+              str = str.substring(deweyMatch[0].length).trim();
+            }
           }
         }
 
+        // 1. หาตำแหน่ง Cutter ตัวแรกใน str (รองรับทั้งตัวอักษรไทย อังกฤษ และจุด)
+        const cutterFinderRegex = /(?:^|[\s\.\/])([A-Za-z\u0E00-\u0E7F]+\d+)/g;
+        let firstCutterIdx = -1;
+        let mCutter;
+        while ((mCutter = cutterFinderRegex.exec(str)) !== null) {
+          const matchedToken = mCutter[1];
+          if (/^[A-Za-z\u0E00-\u0E7F]/.test(matchedToken)) {
+            firstCutterIdx = mCutter.index + mCutter[0].indexOf(matchedToken);
+            break;
+          }
+        }
+
+        // 2. ค้นหาปีพิมพ์ (Publication Year)
         const monthRegexStr = `(?:ม\\.ค\\.?|ก\\.พ\\.?|มี\\.ค\\.?|เม\\.ย\\.?|พ\\.ค\\.?|มิ\\.ย\\.?|ก\\.ค\\.?|ส\\.ค\\.?|ก\\.ย\\.?|ต\\.ค\\.?|พ\\.ย\\.?|ธ\\.ค\\.?|มกราคม|กุมภาพันธ์|มีนาคม|เมษายน|พฤษภาคม|มิถุนายน|กรกฎาคม|สิงหาคม|กันยายน|ตุลาคม|พฤศจิกายน|ธันวาคม|Jan[a-zA-Z]*\\.?|Feb[a-zA-Z]*\\.?|Mar[a-zA-Z]*\\.?|Apr[a-zA-Z]*\\.?|May[a-zA-Z]*\\.?|Jun[a-zA-Z]*\\.?|Jul[a-zA-Z]*\\.?|Aug[a-zA-Z]*\\.?|Sep[a-zA-Z]*\\.?|Sept[a-zA-Z]*\\.?|Oct[a-zA-Z]*\\.?|Nov[a-zA-Z]*\\.?|Dec[a-zA-Z]*\\.?)`;
         const yearRegexStr = `(?:(?:1[89]\\d{2}|20\\d{2}|2[345]\\d{2})(?:-(?:[12]\\d{3}|\\d{2}))?(?:[a-zA-Z\\u0E00-\\u0E7F](?![a-zA-Z\\u0E00-\\u0E7F]))?)`;
 
-        const patternMonthYearRange = new RegExp(monthRegexStr + '\\s*' + yearRegexStr + '\\s*-\\s*' + monthRegexStr + '\\s*' + yearRegexStr, 'i');
-        const patternMonthRangeYear = new RegExp(monthRegexStr + '\\s*-\\s*' + monthRegexStr + '\\s*' + yearRegexStr, 'i');
-        const patternMonthYear = new RegExp(monthRegexStr + '\\s*' + yearRegexStr, 'i');
-        const yearPattern = /(?:^|\s)(?:1[89]\d{2}|20\d{2}|2[345]\d{2})(?:-(?:[12]\d{3}|\d{2}))?(?:[a-zA-Z\u0E00-\u0E7F](?![a-zA-Z\u0E00-\u0E7F]))?(?!\w)/;
+        const yearPatterns = [
+          new RegExp(monthRegexStr + '\\s*' + yearRegexStr + '\\s*-\\s*' + monthRegexStr + '\\s*' + yearRegexStr, 'gi'),
+          new RegExp(monthRegexStr + '\\s*-\\s*' + monthRegexStr + '\\s*' + yearRegexStr, 'gi'),
+          new RegExp(monthRegexStr + '\\s*' + yearRegexStr, 'gi'),
+          new RegExp(`(?:^|[\\s\\.\\/])((?:1[89]\\d{2}|20\\d{2}|2[345]\\d{2})(?:-(?:[12]\\d{3}|\\d{2}))?(?:[a-zA-Z\\u0E00-\\u0E7F](?![a-zA-Z\\u0E00-\\u0E7F]))?)(?=$|[\\s\\.\\/])`, 'gi')
+        ];
 
-        const yearMatch = str.match(patternMonthYearRange) ||
-                          str.match(patternMonthRangeYear) ||
-                          str.match(patternMonthYear) ||
-                          str.match(yearPattern);
+        let allYearMatches = [];
+        for (let pat of yearPatterns) {
+          let m;
+          while ((m = pat.exec(str)) !== null) {
+            const rawText = m[0];
+            const trimmed = rawText.trim();
+            const startIdx = m.index + rawText.indexOf(trimmed);
+            if (!allYearMatches.some(item => Math.max(item.index, startIdx) < Math.min(item.index + item.length, startIdx + trimmed.length))) {
+              allYearMatches.push({ text: trimmed, index: startIdx, length: trimmed.length });
+            }
+          }
+        }
+
+        allYearMatches.sort((a, b) => a.index - b.index);
+
+        let pubYearMatch = null;
+        if (firstCutterIdx !== -1) {
+          pubYearMatch = allYearMatches.find(m => m.index >= firstCutterIdx);
+        } else if (allYearMatches.length > 0) {
+          pubYearMatch = allYearMatches[allYearMatches.length - 1];
+        }
 
         let year = '', restBeforeYear = str, restAfterYear = '';
-        if (yearMatch) {
-          year = yearMatch[0];
-          const idx = yearMatch.index;
-          restBeforeYear = str.substring(0, idx).trim();
-          restAfterYear = str.substring(idx + year.length).trim();
+        if (pubYearMatch) {
+          year = pubYearMatch.text;
+          restBeforeYear = str.substring(0, pubYearMatch.index).trim();
+          restAfterYear = str.substring(pubYearMatch.index + pubYearMatch.length).trim();
         }
 
         const monthPattern = /(?:[\u0E00-\u0E7F]+\.[\u0E00-\u0E7F]+\.-[\u0E00-\u0E7F]+\.[\u0E00-\u0E7F]+\.?|[A-Za-z]{3,4}\.?-[A-Za-z]{3,4}\.?)/i;
@@ -1067,27 +1092,45 @@
           }
         }
 
-        let volAndPartsStr = restAfterYear;
-        let cutterStr = restBeforeYear;
-
-        if (!year && !monthStr) {
-          const volPartMatch = cutterStr.match(/(?:\s+|^)((?:ล\.|เล่ม|v\.|V\.|c\.|C\.|bd\.|pt\.|Pt\.|vol\.|Vol\.|ฉ\.|ต\.|ตอน|part|Part)\s*\d+.*)$/i);
-          if (volPartMatch) {
-            volAndPartsStr = volPartMatch[1].trim();
-            cutterStr = cutterStr.substring(0, volPartMatch.index).trim();
-          }
-        }
-
+        let preCutterAndCutterStr = restBeforeYear;
         let volPartLines = [];
-        if (volAndPartsStr) {
-          const tokens = volAndPartsStr.match(/(?:ล\.|เล่ม|v\.|V\.|c\.|C\.|bd\.|vol\.|Vol\.|ฉ\.|ต\.|ตอน|pt\.|Pt\.|part|Part)\s*\d+[a-zA-Z\u0E00-\u0E7F]*/gi);
-          if (tokens) {
-            volPartLines = tokens.map(t => t.trim());
-          } else {
-            volPartLines = [volAndPartsStr];
+        let extraCutterFromAfterYear = '';
+
+        if (restAfterYear) {
+          const volPartRegexGlobal = /(?:ล\.|เล่ม|v\.|V\.|c\.|C\.|bd\.|vol\.|Vol\.|ฉ\.|ต\.|ตอน|pt\.|Pt\.|part|Part|ค\.)\s*\d+[a-zA-Z\u0E00-\u0E7F]*/gi;
+          const volMatches = restAfterYear.match(volPartRegexGlobal) || [];
+          volPartLines = volMatches.map(v => v.trim());
+
+          extraCutterFromAfterYear = restAfterYear.replace(volPartRegexGlobal, ' ').replace(/\s+/g, ' ').trim();
+        }
+
+        if (extraCutterFromAfterYear) {
+          preCutterAndCutterStr = (preCutterAndCutterStr + ' ' + extraCutterFromAfterYear).trim();
+        }
+
+        if (!year && !monthStr && volPartLines.length === 0) {
+          const volPartMatch = preCutterAndCutterStr.match(/(?:\s+|^)((?:ล\.|เล่ม|v\.|V\.|c\.|C\.|bd\.|vol\.|Vol\.|ฉ\.|ต\.|ตอน|pt\.|Pt\.|part|Part|ค\.)\s*\d+.*)$/i);
+          if (volPartMatch) {
+            const matchedVol = volPartMatch[1].trim();
+            volPartLines = [matchedVol];
+            preCutterAndCutterStr = preCutterAndCutterStr.substring(0, volPartMatch.index).trim();
           }
         }
 
+        let preCutterStr = '';
+        let cutterStr = preCutterAndCutterStr;
+
+        const cutterInRestMatch = preCutterAndCutterStr.match(/(?:^|[\s\.\/])([A-Za-z\u0E00-\u0E7F]+\d+)/);
+        if (cutterInRestMatch) {
+          const matchStart = cutterInRestMatch.index + cutterInRestMatch[0].indexOf(cutterInRestMatch[1]);
+          preCutterStr = preCutterAndCutterStr.substring(0, matchStart).replace(/\.$/, '').trim();
+          cutterStr = preCutterAndCutterStr.substring(matchStart).trim();
+        } else {
+          preCutterStr = preCutterAndCutterStr;
+          cutterStr = '';
+        }
+
+        const preCutterLines = preCutterStr ? preCutterStr.split(/\s+/).filter(Boolean) : [];
         const cutterLines = parseCutters(cutterStr);
 
         if (prefixLine) lines.push(prefixLine);
@@ -1097,6 +1140,7 @@
           if (classPrefix) lines.push(classPrefix);
           if (classNum) lines.push(classNum);
         }
+        lines.push(...preCutterLines);
         lines.push(...cutterLines);
         if (year) lines.push('<span class="year-line">' + escapeHtml(year) + '</span>');
         if (monthStr) lines.push(monthStr);
