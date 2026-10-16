@@ -113,12 +113,117 @@
     /* ---------- Font scale ---------- */
     .scale-panel {
       margin-top: 8px;
-      display: flex;
-      align-items: center;
-      gap: 4px;
       font-size: 12.5px;
       color: var(--muted);
     }
+
+    .scale-row {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .scale-note {
+      margin-top: 8px;
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+      font-size: 12.5px;
+      line-height: 1.45;
+      color: var(--muted);
+    }
+
+    .scale-note svg.ico { width: 15px; height: 15px; flex: none; margin-top: 2px; }
+    .scale-note.is-locked { color: var(--accent-strong); font-weight: 500; }
+
+    /* ---------- Lock toggle ---------- */
+    .lock-btn {
+      width: 100%;
+      margin-top: 8px;
+      padding: 8px 12px 8px 8px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font: inherit;
+      text-align: left;
+      color: var(--ink);
+      background: var(--field);
+      border: 1px solid var(--line-strong);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background-color .15s ease, border-color .15s ease;
+    }
+
+    .lock-btn:hover { border-color: var(--accent); }
+
+    .lock-btn:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .lock-ico {
+      flex: none;
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      border-radius: 10px;
+      color: var(--muted);
+      background: var(--track);
+      transition: background-color .15s ease, color .15s ease;
+    }
+
+    .lock-ico svg.ico { width: 19px; height: 19px; }
+    .lock-ico .ico-locked { display: none; }
+
+    .lock-text {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      line-height: 1.3;
+    }
+
+    .lock-title { font-size: 13.5px; font-weight: 600; }
+    .lock-desc  { font-size: 12px; color: var(--muted); }
+
+    .lock-switch {
+      flex: none;
+      position: relative;
+      width: 38px;
+      height: 22px;
+      border-radius: 999px;
+      background: var(--line-strong);
+      transition: background-color .15s ease;
+    }
+
+    .lock-switch::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #ffffff;
+      box-shadow: 0 1px 2px rgba(20, 40, 45, .3);
+      transition: transform .15s ease;
+    }
+
+    .lock-btn.is-locked {
+      background: var(--accent-soft);
+      border-color: var(--accent);
+    }
+
+    .lock-btn.is-locked .lock-ico {
+      color: #ffffff;
+      background: var(--accent-strong);
+    }
+
+    .lock-btn.is-locked .ico-locked { display: block; }
+    .lock-btn.is-locked .ico-open   { display: none; }
+    .lock-btn.is-locked .lock-switch { background: var(--accent); }
+    .lock-btn.is-locked .lock-switch::after { transform: translateX(16px); }
 
     .scale-title { margin-right: auto; }
 
@@ -646,14 +751,32 @@
       </div>
 
       <div class="scale-panel" role="group" aria-label="ขนาดตัวอักษร">
-        <span class="scale-title">ขนาดตัวอักษร</span>
-        <button type="button" class="scale-reset is-hidden" id="scaleReset" onclick="updateFontScale(100)">คืนค่าปกติ</button>
-        <button type="button" class="step-btn" id="scaleMinus" aria-label="ลดขนาดตัวอักษร 5%" onclick="nudgeFontScale(-5)">
-          <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/></svg>
-        </button>
-        <span class="scale-value" id="scaleValue" aria-live="polite">100%</span>
-        <button type="button" class="step-btn" id="scalePlus" aria-label="เพิ่มขนาดตัวอักษร 5%" onclick="nudgeFontScale(5)">
-          <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+        <div class="scale-row">
+          <span class="scale-title">ขนาดตัวอักษร</span>
+          <button type="button" class="scale-reset is-hidden" id="scaleReset" onclick="updateFontScale(100)">คืนค่าปกติ</button>
+          <button type="button" class="step-btn" id="scaleMinus" aria-label="ลดขนาดตัวอักษร 5%" onclick="nudgeFontScale(-5)">
+            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/></svg>
+          </button>
+          <span class="scale-value" id="scaleValue" aria-live="polite">100%</span>
+          <button type="button" class="step-btn" id="scalePlus" aria-label="เพิ่มขนาดตัวอักษร 5%" onclick="nudgeFontScale(5)">
+            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+          </button>
+        </div>
+
+        <p class="scale-note" id="scaleNote" role="status">
+          <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 7.6v.1"/></svg>
+          <span id="scaleNoteText"></span>
+        </p>
+
+        <button type="button" class="lock-btn" id="lockBtn" role="switch" aria-checked="false" onclick="toggleScaleLock()">
+          <span class="lock-ico" aria-hidden="true">
+            <svg class="ico ico-open" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2.2"/><path d="M8 11V8a4 4 0 0 1 7.6-1.7"/></svg>
+            <svg class="ico ico-locked" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2.2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+          </span>
+          <span class="lock-text">
+            <span class="lock-title" id="lockTitle">ล็อกขนาดนี้ไว้</span>
+          </span>
+          <span class="lock-switch" aria-hidden="true"></span>
         </button>
       </div>
 
@@ -668,7 +791,9 @@
 
     const SCALE_MIN = 50, SCALE_MAX = 100;
     const SCALE_KEY = 'labelFontScalePct';
+    const LOCK_KEY = 'labelFontScaleLocked';
     let currentScale = 100;
+    let scaleLocked = false;
 
     const MODES = ['normal', 'rare', 'ref', 'thesis', 'acom', 'rew', 'z', 'ks'];
 
@@ -686,11 +811,41 @@
       document.getElementById('scaleMinus').disabled = pct <= SCALE_MIN;
       document.getElementById('scalePlus').disabled = pct >= SCALE_MAX;
 
-      if (persist) {
+      // จดจำขนาดไว้เฉพาะตอนล็อกเท่านั้น
+      if (persist && scaleLocked) {
         try { localStorage.setItem(SCALE_KEY, String(pct)); } catch (e) {}
       }
 
+      renderLock();
       checkFit();
+    }
+
+    function renderLock() {
+      const btn = document.getElementById('lockBtn');
+      if (!btn) return;
+      btn.classList.toggle('is-locked', scaleLocked);
+      btn.setAttribute('aria-checked', scaleLocked ? 'true' : 'false');
+      document.getElementById('lockTitle').textContent =
+        scaleLocked ? 'ล็อกไว้ที่ ' + currentScale + '%' : 'ล็อกขนาดนี้ไว้';
+      const note = document.getElementById('scaleNote');
+      note.classList.toggle('is-locked', scaleLocked);
+      document.getElementById('scaleNoteText').textContent = scaleLocked
+        ? 'ตอนนี้ล็อกอยู่ ทุกครั้งที่กดสร้างจะใช้ ' + currentScale + '% ปลดล็อกเพื่อกลับเป็น 100% เสมอ'
+        : 'ทุกครั้งที่กดสร้าง ระบบจะใช้ 100% เสมออยู่แล้ว ไม่ต้องกดล็อก ใช้ปุ่มล็อกเฉพาะเมื่อต้องการคงขนาดอื่นที่ไม่ใช่ 100%';
+    }
+
+    function toggleScaleLock() {
+      scaleLocked = !scaleLocked;
+      try {
+        if (scaleLocked) {
+          localStorage.setItem(LOCK_KEY, '1');
+          localStorage.setItem(SCALE_KEY, String(currentScale));
+        } else {
+          localStorage.removeItem(LOCK_KEY);
+          localStorage.removeItem(SCALE_KEY);
+        }
+      } catch (e) {}
+      renderLock();
     }
 
     function labelFits() {
@@ -827,8 +982,11 @@
     function initFontScale() {
       let saved = 100;
       try {
+        scaleLocked = localStorage.getItem(LOCK_KEY) === '1';
         const v = localStorage.getItem(SCALE_KEY);
-        if (v !== null) saved = parseFloat(v);
+        // ใช้ขนาดที่จำไว้เฉพาะเมื่อล็อกอยู่ ไม่เช่นนั้นเริ่มที่ 100% เสมอ
+        if (scaleLocked && v !== null) saved = parseFloat(v);
+        if (!scaleLocked && v !== null) localStorage.removeItem(SCALE_KEY);
       } catch (e) {}
       updateFontScale(saved, false);
     }
@@ -969,6 +1127,11 @@
       }
 
       lastRawInput = str;
+
+      // กดสร้างใหม่ → รีเซ็ตขนาดเป็น 100% ยกเว้นล็อกไว้ หรือแค่เปลี่ยนประเภทหนังสือ
+      if (!fromModeChange && !scaleLocked && currentScale !== 100) {
+        updateFontScale(100, false);
+      }
 
       if (rawDisplayEl) {
         rawDisplayEl.innerHTML = 'จาก Call No.: <span>' + escapeHtml(str) + '</span>';
