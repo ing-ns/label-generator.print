@@ -847,14 +847,14 @@
       btn.classList.toggle('is-locked', scaleLocked);
       btn.setAttribute('aria-checked', scaleLocked ? 'true' : 'false');
       document.getElementById('lockTitle').textContent =
-        scaleLocked ? 'ล็อกไว้ที่ ' + currentScale + '%' : 'ล็อกขนาดนี้ไว้';
+        scaleLocked ? 'ล็อกไว้ที่ ' + currentScale + '%' : 'ล็อกขนาดนี้ไว้ (เพื่อใช้สำหรับ Label ถัดไป)';
 
       const note = document.getElementById('scaleNote');
       note.classList.toggle('is-locked', scaleLocked);
 
       if (is100) {
         document.getElementById('scaleNoteText').textContent =
-          'ขนาดปกติ 100% ไม่จำเป็นต้องกดล็อก ระบบจะใช้ 100% สำหรับ Label ถัดไปให้อัตโนมัติอยู่แล้ว (กดล็อกได้เฉพาะเมื่อปรับเป็นขนาดอื่น)';
+          'ขนาดปกติ 100% ไม่จำเป็นต้องกดล็อก ระบบจะใช้ 100% สำหรับ Label ถัดไปให้อัตโนมัติอยู่แล้ว (กดล็อกได้เฉพาะเมื่อปรับเป็นขนาดอื่นแล้วต้องการให้อันถัดไปเป็นขาดเดิม)';
       } else if (scaleLocked) {
         document.getElementById('scaleNoteText').textContent =
           'ตอนนี้ล็อกไว้ที่ ' + currentScale + '% แล้ว Label อันถัดไปที่กดสร้างจะใช้ขนาด ' + currentScale + '% นี้ด้วย';
