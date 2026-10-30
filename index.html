@@ -1293,7 +1293,7 @@
           restAfterYear = str.substring(pubYearMatch.index + pubYearMatch.length).trim();
         }
 
-        const monthPattern = /(?:[\u0E00-\u0E7F]+\.[\u0E00-\u0E7F]+\.-[\u0E00-\u0E7F]+\.[\u0E00-\u0E7F]+\.?|[A-Za-z]{3,4}\.?-[A-Za-z]{3,4}\.?)/i;
+        const monthPattern = new RegExp(`(?:${monthRegexStr}(?:\\s*-\\s*${monthRegexStr})?)`, 'i');
         let monthStr = '';
         const monthMatchAfter = restAfterYear.match(monthPattern);
         if (monthMatchAfter) {
@@ -1304,7 +1304,10 @@
           if (monthMatchBefore) {
             monthStr = monthMatchBefore[0];
             restBeforeYear = (restBeforeYear.substring(0, monthMatchBefore.index) + ' ' + restBeforeYear.substring(monthMatchBefore.index + monthStr.length)).trim();
-          }
+           }
+        }
+        if (monthStr && /[\u0E00-\u0E7F]\.[\u0E00-\u0E7F]$/.test(monthStr)) {
+          monthStr += '.';
         }
 
         let preCutterAndCutterStr = restBeforeYear;
