@@ -67,7 +67,7 @@
     .app-mark {
       width: 30px;
       height: 30px;
-      border-radius: 9px;
+      border-radius: 99px;
       background: var(--accent-soft);
       color: var(--accent-strong);
       display: grid;
@@ -191,7 +191,6 @@
     }
 
     .lock-title { font-size: 13.5px; font-weight: 600; }
-    .lock-desc  { font-size: 12px; color: var(--muted); }
 
     .lock-switch {
       flex: none;
@@ -470,6 +469,89 @@
       cursor: default;
     }
 
+    .btn-print.is-secondary {
+      color: var(--accent-strong);
+      background: transparent;
+      border: 1px solid var(--line-strong);
+    }
+
+    .btn-print.is-secondary:hover:not(:disabled) {
+      color: var(--accent-strong);
+      background: var(--accent-soft);
+      border-color: var(--accent);
+    }
+
+    .btn-print.is-secondary:disabled {
+      color: #7d8b90;
+      background: transparent;
+      border-color: var(--line);
+    }
+
+    .btn-print.is-primary {
+      height: 40px;
+      min-width: 150px;
+      font-size: 15.5px;
+      box-shadow: 0 1px 3px rgba(20, 40, 45, .22);
+    }
+
+    .btn-print.is-primary:disabled { box-shadow: none; }
+
+    /* ---------- Toast ---------- */
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 20px;
+      z-index: 50;
+      max-width: calc(100vw - 32px);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 10px 12px 10px 16px;
+      font-size: 14.5px;
+      line-height: 1.3;
+      color: #ffffff;
+      background: #1e2a2f;
+      border-radius: 12px;
+      box-shadow: 0 10px 28px -8px rgba(20, 40, 45, .45);
+      transform: translate(-50%, 16px);
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity .18s ease, transform .18s ease, visibility 0s linear .18s;
+    }
+
+    .toast.show {
+      opacity: 1;
+      visibility: visible;
+      transform: translate(-50%, 0);
+      pointer-events: auto;
+      transition-delay: 0s;
+    }
+
+    .toast-text {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .toast-btn {
+      flex: none;
+      height: 32px;
+      padding: 0 12px;
+      font: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      color: #1e2a2f;
+      background: #bfe3ea;
+      border: 0;
+      border-radius: 9px;
+      cursor: pointer;
+    }
+
+    .toast-btn:hover { background: #d6eef3; }
+    .toast-btn:focus-visible { outline: 2px solid #ffffff; outline-offset: 2px; }
+
     .stage {
       background: var(--stage);
       border-radius: 12px;
@@ -525,13 +607,23 @@
       font-size: 1.03em;
     }
 
-    #labelPreview[data-lines="1"],
-    #labelPreview[data-lines="2"],
-    #labelPreview[data-lines="3"] { line-height: 1.2; }
-    #labelPreview[data-lines="4"] { line-height: 0.9; }
-    #labelPreview[data-lines="5"] { line-height: 0.77; }
-    #labelPreview[data-lines="6"] { line-height: 0.7; }
-    #labelPreview[data-lines="7"] { line-height: 0.64; }
+    #labelPreview[data-lines="1"], #measurePreview[data-lines="1"],
+    #labelPreview[data-lines="2"], #measurePreview[data-lines="2"],
+    #labelPreview[data-lines="3"], #measurePreview[data-lines="3"] { line-height: 1.2; }
+    #labelPreview[data-lines="4"], #measurePreview[data-lines="4"] { line-height: 0.9; }
+    #labelPreview[data-lines="5"], #measurePreview[data-lines="5"] { line-height: 0.77; }
+    #labelPreview[data-lines="6"], #measurePreview[data-lines="6"] { line-height: 0.7; }
+    #labelPreview[data-lines="7"], #measurePreview[data-lines="7"],
+    #labelPreview[data-lines="8"], #measurePreview[data-lines="8"],
+    #labelPreview[data-lines="9"], #measurePreview[data-lines="9"] { line-height: 0.62; }
+
+    .label-frame.measure {
+      position: absolute;
+      left: -9999px;
+      top: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
 
     .label-preview.is-empty {
       width: auto;
@@ -557,8 +649,342 @@
       font-weight: normal;
     }
 
-    .raw-input-display.show { display: block; }
-    .raw-input-display span { font-weight: normal; margin-left: 2px; }
+    .raw-input-display.show {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .raw-input-text { flex: 1; min-width: 0; }
+    .raw-input-display span.raw-val { font-weight: normal; margin-left: 2px; }
+
+    .btn-import {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-import svg.ico { width: 16px; height: 16px; }
+
+    .btn-ghost.is-drag {
+      color: var(--accent-strong);
+      border-color: var(--accent);
+      background: var(--accent-soft);
+    }
+
+    .queue-card .result-head { flex-wrap: wrap; }
+    .queue-card .btn-actions { flex-wrap: wrap; justify-content: flex-end; }
+
+    .import-status {
+      margin-bottom: 8px;
+      padding: 7px 10px;
+      font-size: 12.5px;
+      line-height: 1.45;
+      white-space: pre-line;
+      color: var(--accent-strong);
+      background: var(--accent-soft);
+      border-radius: 10px;
+    }
+
+    .import-status.is-error {
+      color: #a33a2a;
+      background: #fdf1ef;
+    }
+
+    .import-status[hidden] { display: none; }
+
+    /* ---------- Print queue ---------- */
+    .btn-ghost {
+      height: 36px;
+      padding: 0 12px;
+      font: inherit;
+      font-size: 13.5px;
+      font-weight: 500;
+      color: var(--muted);
+      background: transparent;
+      border: 1px solid var(--line-strong);
+      border-radius: 11px;
+      cursor: pointer;
+      transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+    }
+
+    .btn-ghost:hover:not(:disabled) {
+      color: var(--accent-strong);
+      border-color: var(--accent);
+      background: var(--accent-soft);
+    }
+
+    .btn-ghost:disabled { opacity: .4; cursor: default; }
+
+    .btn-ghost:focus-visible,
+    .q-pick:focus-visible,
+    .q-del:focus-visible,
+    .q-qty-btn:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .queue-count {
+      display: inline-grid;
+      place-items: center;
+      min-width: 22px;
+      height: 22px;
+      padding: 0 6px;
+      margin-left: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent-strong);
+      background: var(--accent-soft);
+      border-radius: 999px;
+      vertical-align: 1px;
+    }
+
+    .queue-hint {
+      margin-bottom: 8px;
+      font-size: 12.5px;
+      line-height: 1.45;
+      color: var(--muted);
+    }
+
+    .queue-list {
+      list-style: none;
+      position: relative;
+      max-height: 240px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .q-item { display: flex; align-items: center; gap: 6px; }
+
+    .q-pick {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px;
+      font: inherit;
+      text-align: left;
+      color: var(--ink);
+      background: var(--field);
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      cursor: pointer;
+      transition: background-color .15s ease, border-color .15s ease;
+    }
+
+    .q-pick:hover { border-color: var(--accent); }
+
+    .q-item.is-current .q-pick {
+      background: var(--accent-soft);
+      border-color: var(--accent);
+    }
+
+    .q-num {
+      flex: none;
+      width: 24px;
+      height: 24px;
+      display: grid;
+      place-items: center;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      background: var(--track);
+      border-radius: 8px;
+    }
+
+    .q-item.is-current .q-num { color: #ffffff; background: var(--accent-strong); }
+
+    .q-main {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      line-height: 1.3;
+    }
+
+    .q-sub {
+      font-size: 12px;
+      color: var(--muted);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .q-text {
+      min-width: 0;
+      font-size: 13.5px;
+      font-weight: 500;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .q-badge {
+      flex: none;
+      font-size: 11.5px;
+      font-weight: 600;
+      padding: 1px 7px;
+      color: var(--accent-strong);
+      background: var(--accent-soft);
+      border-radius: 999px;
+    }
+
+    .q-badge.warn {
+      color: #7a4300;
+      background: #fff6e8;
+      border: 1px solid #f0d6a8;
+    }
+
+    /* ---------- Qty Controller ---------- */
+    .q-qty-ctrl {
+      flex: none;
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      background: var(--field);
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      padding: 2px;
+      height: 38px;
+    }
+
+    .q-qty-btn {
+      width: 26px;
+      height: 32px;
+      display: grid;
+      place-items: center;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--muted);
+      background: transparent;
+      border: 0;
+      border-radius: 7px;
+      cursor: pointer;
+      transition: background-color .15s ease, color .15s ease;
+    }
+
+    .q-qty-btn:hover:not(:disabled) {
+      color: var(--accent-strong);
+      background: var(--accent-soft);
+    }
+
+    .q-qty-btn:disabled {
+      opacity: .3;
+      cursor: default;
+    }
+
+    .q-qty-num {
+      min-width: 22px;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--ink);
+      font-variant-numeric: tabular-nums;
+      user-select: none;
+    }
+
+    .q-del {
+      flex: none;
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      color: var(--muted);
+      background: transparent;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      cursor: pointer;
+      transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+    }
+
+    .q-del svg.ico { width: 15px; height: 15px; stroke-width: 2.2; }
+
+    .q-del:hover {
+      color: #a33a2a;
+      border-color: #d9a79e;
+      background: #fdf1ef;
+    }
+
+    #printSheet { display: none; }
+
+    .print-label {
+      width: 30mm;
+      height: 39.8mm;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      page-break-after: always;
+      break-after: page;
+    }
+
+    .print-label:last-child {
+      page-break-after: auto;
+      break-after: auto;
+    }
+
+    .pl-text {
+      display: inline-block;
+      width: fit-content;
+      max-width: 100%;
+      text-align: left;
+      white-space: pre-line;
+      word-break: break-word;
+      font-family: 'Angsana New', 'AngsanaUPC', 'Sarabun', sans-serif;
+      font-size: calc(24pt * var(--font-scale, 1));
+      font-style: normal;
+      font-weight: 700;
+      letter-spacing: .01em;
+      color: #000000;
+    }
+
+    .pl-text .year-line { font-size: 1.03em; }
+
+    .pl-text[data-lines="1"],
+    .pl-text[data-lines="2"],
+    .pl-text[data-lines="3"] { line-height: 1.2; }
+    .pl-text[data-lines="4"] { line-height: 0.9; }
+    .pl-text[data-lines="5"] { line-height: 0.77; }
+    .pl-text[data-lines="6"] { line-height: 0.7; }
+    .pl-text[data-lines="7"],
+    .pl-text[data-lines="8"],
+    .pl-text[data-lines="9"] { line-height: 0.62; }
+
+    @media screen and (min-width: 960px) {
+      .app {
+        max-width: 1100px;
+        height: 100vh;
+        min-height: 800px;
+        display: grid;
+        grid-template-columns: minmax(0, 500px) minmax(0, 1fr);
+        grid-template-rows: auto auto minmax(0, 1fr);
+        grid-template-areas:
+          "head   queue"
+          "input  queue"
+          "result queue";
+        column-gap: 16px;
+        row-gap: 10px;
+      }
+
+      .app-header  { grid-area: head; }
+      .input-card  { grid-area: input; }
+      .result-card { grid-area: result; align-self: start; }
+
+      .queue-card {
+        grid-area: queue;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+      }
+
+      .queue-list {
+        flex: 1;
+        min-height: 0;
+        max-height: none;
+      }
+    }
 
     /* ---------- Warnings ---------- */
     .fit-warn[hidden], .font-note[hidden] { display: none; }
@@ -617,27 +1043,27 @@
         padding: 0 !important;
         background: #ffffff !important;
         overflow: hidden !important;
-        display: flex !important;
-        justify-content: center !important;
-        align-items: center !important;
       }
 
       .app-header,
-      .card:first-of-type,
+      .input-card,
+      .queue-card,
+      .label-frame.measure,
       .result-head,
       .scale-panel,
       .fit-warn,
       .font-note,
+      .toast,
       .raw-input-display {
         display: none !important;
       }
 
-      .app, .card, .stage, .label-frame {
+      .app, .result-card, .stage, .label-frame {
         display: flex !important;
         justify-content: center !important;
         align-items: center !important;
-        width: 100% !important;
-        height: 100% !important;
+        width: 30mm !important;
+        height: 40mm !important;
         margin: 0 !important;
         padding: 0 !important;
         border: none !important;
@@ -683,7 +1109,22 @@
       #labelPreview[data-lines="4"] { line-height: 0.9 !important; }
       #labelPreview[data-lines="5"] { line-height: 0.77 !important; }
       #labelPreview[data-lines="6"] { line-height: 0.7 !important; }
-      #labelPreview[data-lines="7"] { line-height: 0.65 !important; }
+      #labelPreview[data-lines="7"],
+      #labelPreview[data-lines="8"],
+      #labelPreview[data-lines="9"] { line-height: 0.62 !important; }
+
+      #printSheet { display: none !important; }
+
+      html.print-all,
+      html.print-all body {
+        width: 30mm !important;
+        height: auto !important;
+        overflow: visible !important;
+        display: block !important;
+      }
+
+      html.print-all .app { display: none !important; }
+      html.print-all #printSheet { display: block !important; }
     }
   </style>
 </head>
@@ -697,7 +1138,7 @@
       <h1>ระบบสร้าง Label เลขเรียกหนังสือ</h1>
     </header>
 
-    <section class="card" aria-label="ป้อนข้อมูล">
+    <section class="card input-card" aria-label="ป้อนข้อมูล">
       <span class="field-label" id="modeLabel">ประเภทหนังสือ</span>
       <div class="segmented" role="radiogroup" aria-labelledby="modeLabel">
         <button type="button" class="seg-btn active-mode" data-mode="normal" role="radio" aria-checked="true" tabindex="0" onclick="setMode('normal', true)"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6.5C10.5 5.3 8.3 4.7 5 4.7v12.6c3.3 0 5.5.6 7 1.8 1.5-1.2 3.7-1.8 7-1.8V4.7c-3.3 0-5.5.6-7 1.8zM12 6.5v12.6"/></svg><span>ทั่วไป / CRE</span></button>
@@ -722,22 +1163,22 @@
             onkeydown="handleKeyDown(event)"
             autofocus
           >
-          <button type="button" class="btn-generate" onclick="generateLabel()">สร้าง</button>
+          <button type="button" class="btn-generate" id="generateBtn" onclick="generateLabel()">สร้าง</button>
         </div>
         <p class="key-hint">กด <kbd>Enter</kbd> เพื่อสร้าง | <kbd>Alt</kbd> + <kbd>1-8</kbd> หรือ <kbd>Alt</kbd> + <kbd>←</kbd> <kbd>→</kbd> เปลี่ยนประเภทหนังสือ</p>
       </div>
     </section>
 
-    <section class="card" aria-label="ผลลัพธ์">
+    <section class="card result-card" aria-label="ผลลัพธ์">
       <div class="result-head">
         <h2>ผลลัพธ์</h2>
         <div class="btn-actions">
-          <button type="button" class="btn-print" id="printBtn" onclick="window.print()" disabled>
+          <button type="button" class="btn-print is-secondary" id="printBtn" onclick="printSingle()" disabled>
             <svg class="ico" viewBox="0 0 24 24" aria-hidden="true">
               <path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
               <rect x="6" y="14" width="12" height="8"/>
             </svg>
-            <span>สั่งพิมพ์</span>
+            <span>พิมพ์ใบนี้</span>
           </button>
         </div>
       </div>
@@ -789,7 +1230,42 @@
       <p class="font-note" id="fontNote" hidden>เครื่องนี้ไม่มีฟอนต์ Angsana New จึงใช้ Sarabun แทน ระยะบรรทัดและความกว้างอาจต่างจากที่ออกแบบไว้</p>
     </section>
 
+    <section class="card queue-card" aria-label="คิวพิมพ์">
+      <div class="result-head">
+        <h2>คิวพิมพ์<span class="queue-count" id="queueCount">0</span></h2>
+        <div class="btn-actions">
+          <input type="file" id="fileInput" accept=".xlsx,.xlsm,.csv,.tsv" multiple hidden onchange="onFilesPicked(event)">
+          <button type="button" class="btn-ghost btn-import" id="dropBtn" onclick="document.getElementById('fileInput').click()" title="เลือกไฟล์ .xlsx หรือ .csv ที่มีคอลัมน์ Call No. (หรือลากไฟล์มาวางในหน้านี้)">
+            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M12 17v-6M9.5 13.5 12 11l2.5 2.5"/></svg>
+            <span>นำเข้า Excel</span>
+          </button>
+          <button type="button" class="btn-ghost" id="queueClear" onclick="clearQueue()" disabled>ล้างทั้งหมด</button>
+          <button type="button" class="btn-print is-primary" id="printAllBtn" onclick="printAll()" disabled>
+            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+              <rect x="6" y="14" width="12" height="8"/>
+            </svg>
+            <span id="printAllText">พิมพ์ทั้งหมด</span>
+          </button>
+        </div>
+      </div>
+      <p class="import-status" id="importStatus" role="status" hidden></p>
+      <p class="queue-hint" id="queueHint"></p>
+      <ul class="queue-list" id="queueList"></ul>
+    </section>
+
   </main>
+
+  <div id="printSheet" aria-hidden="true"></div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite">
+    <span class="toast-text" id="toastText"></span>
+    <button type="button" class="toast-btn" id="toastUndo" onclick="undoRemove()">เลิกทำ</button>
+  </div>
+
+  <div class="label-frame measure" id="measureFrame" aria-hidden="true">
+    <div id="measurePreview" class="label-preview"></div>
+  </div>
 
   <script>
     let currentMode = 'normal';
@@ -800,6 +1276,11 @@
     const LOCK_KEY = 'labelFontScaleLocked';
     let currentScale = 100;
     let scaleLocked = false;
+    let lockedScale = 100;
+    let queue = [];
+    let currentIdx = -1;
+    let removedItem = null;
+    let toastTimer = null;
 
     const MODES = ['normal', 'rare', 'ref', 'thesis', 'acom', 'rew', 'z', 'ks'];
 
@@ -809,15 +1290,6 @@
       pct = Math.min(SCALE_MAX, Math.max(SCALE_MIN, pct));
       currentScale = pct;
 
-      // ถ้าปรับขนาดเป็น 100% จะให้ยกเลิกล็อกทันที (เนื่องจากขนาด 100% ล็อกไม่ได้)
-      if (currentScale === 100 && scaleLocked) {
-        scaleLocked = false;
-        try {
-          localStorage.removeItem(LOCK_KEY);
-          localStorage.removeItem(SCALE_KEY);
-        } catch (e) {}
-      }
-
       const previewEl = document.getElementById('labelPreview');
       if (previewEl) previewEl.style.setProperty('--font-scale', pct / 100);
 
@@ -826,8 +1298,16 @@
       document.getElementById('scaleMinus').disabled = pct <= SCALE_MIN;
       document.getElementById('scalePlus').disabled = pct >= SCALE_MAX;
 
-      // จดจำขนาดไว้เฉพาะตอนล็อกเท่านั้น
-      if (persist && scaleLocked) {
+      if (persist && queue[currentIdx]) queue[currentIdx].scale = pct;
+
+      if (currentScale === 100 && scaleLocked) {
+        scaleLocked = false;
+        try {
+          localStorage.removeItem(LOCK_KEY);
+          localStorage.removeItem(SCALE_KEY);
+        } catch (e) {}
+      } else if (persist && scaleLocked) {
+        lockedScale = pct;
         try { localStorage.setItem(SCALE_KEY, String(pct)); } catch (e) {}
       }
 
@@ -841,34 +1321,38 @@
 
       const is100 = (currentScale === 100);
 
-      // ปิดการใช้งานปุ่มล็อกเมื่อขนาดตัวอักษรเป็น 100%
-      btn.disabled = is100;
+      if (is100) {
+        scaleLocked = false;
+        btn.disabled = true;
+      } else {
+        btn.disabled = false;
+      }
 
       btn.classList.toggle('is-locked', scaleLocked);
       btn.setAttribute('aria-checked', scaleLocked ? 'true' : 'false');
       document.getElementById('lockTitle').textContent =
-        scaleLocked ? 'ล็อกไว้ที่ ' + currentScale + '%' : 'ล็อกขนาดนี้ไว้';
+        scaleLocked ? 'ล็อกไว้ที่ ' + lockedScale + '%' : 'ล็อกขนาดนี้ไว้';
 
       const note = document.getElementById('scaleNote');
       note.classList.toggle('is-locked', scaleLocked);
 
       if (is100) {
         document.getElementById('scaleNoteText').textContent =
-          'ปุ่มล็อกใช้กรณีต้องการใช้ขนาดเดิม (ที่ไม่ใช่ 100%) หลายๆ ใบ';
+          'ปุ่มล็อกใช้กรณีต้องการใช้ขนาดเดิม (ที่ไม่ใช่ 100%) ต่อเนื่องหลายๆ ใบ';
       } else if (scaleLocked) {
         document.getElementById('scaleNoteText').textContent =
-          'ตอนนี้ล็อกไว้ที่ ' + currentScale + '% แล้ว Label อันถัดไปที่กดสร้างจะใช้ขนาด ' + currentScale + '% นี้ด้วย';
+          'ล็อกอยู่ label ใหม่จะใช้ ' + lockedScale + '%';
       } else {
         document.getElementById('scaleNoteText').textContent =
-          'กดล็อกขนาดนี้ไว้ เพื่อให้ Label อันถัดไปใช้ขนาด ' + currentScale + '% นี้ต่อ';
+          'กดล็อกเพื่อใช้ ' + currentScale + '% ต่อเนื่อง';
       }
     }
 
     function toggleScaleLock() {
-      // ไม่อนุญาตให้กดล็อกถ้าอยู่ที่ขนาด 100%
       if (currentScale === 100) return;
 
       scaleLocked = !scaleLocked;
+      if (scaleLocked) lockedScale = currentScale;
       try {
         if (scaleLocked) {
           localStorage.setItem(LOCK_KEY, '1');
@@ -881,9 +1365,9 @@
       renderLock();
     }
 
-    function labelFits() {
-      const frame = document.getElementById('labelFrame');
-      const el = document.getElementById('labelPreview');
+    function labelFits(frame, el) {
+      frame = frame || document.getElementById('labelFrame');
+      el = el || document.getElementById('labelPreview');
       const st = el.style;
 
       st.whiteSpace = 'pre';
@@ -911,6 +1395,7 @@
       }
 
       const fits = labelFits();
+      markOver(!fits);
       frame.classList.toggle('is-over', !fits);
       warn.hidden = fits;
       if (!fits) {
@@ -929,6 +1414,13 @@
         if (labelFits()) break;
       }
       updateFontScale(currentScale);
+    }
+
+    function printSingle() {
+      if (!labelFits()) {
+        fitFontScale();
+      }
+      window.print();
     }
 
     function hasLocalFont(name) {
@@ -1017,10 +1509,12 @@
       try {
         scaleLocked = localStorage.getItem(LOCK_KEY) === '1';
         const v = localStorage.getItem(SCALE_KEY);
-        // ใช้ขนาดที่จำไว้เฉพาะเมื่อล็อกอยู่ ไม่เช่นนั้นเริ่มที่ 100% เสมอ
         if (scaleLocked && v !== null) saved = parseFloat(v);
         if (!scaleLocked && v !== null) localStorage.removeItem(SCALE_KEY);
       } catch (e) {}
+      lockedScale = scaleLocked
+        ? Math.min(SCALE_MAX, Math.max(SCALE_MIN, Math.round(saved) || 100))
+        : 100;
       updateFontScale(saved, false);
     }
 
@@ -1099,6 +1593,37 @@
       return null;
     }
 
+    /* จับคู่ข้อความจากคอลัมน์ Collection กับประเภทปุ่ม */
+    function getModeFromCollection(colStr) {
+      if (!colStr) return 'normal';
+      const clean = String(colStr).trim().toLowerCase();
+      const n = clean.replace(/[\s._-]+/g, '');
+
+      if (n === 'generalbooks' || n === 'generalbook' || n === 'fiction' || n === 'juvenilebooks' || n === 'juvenilebook' || n === 'documents' || n === 'document' || n === 'doc') {
+        return 'normal';
+      }
+      if (n === 'rarebooks' || n === 'rarebook' || n.includes('rarebook')) {
+        return 'rare';
+      }
+      if (n === 'referencebooks' || n === 'referencebook' || n.includes('referencebook') || n.includes('refbook')) {
+        return 'ref';
+      }
+      if (n === 'theses' || n === 'thesis' || n.includes('thesis') || n.includes('theses')) {
+        return 'thesis';
+      }
+      if (n === 'awardedbooks' || n === 'awardedbook' || n.includes('awarded')) {
+        return 'rew';
+      }
+      if (n === 'specialsizepublications' || n === 'specialsizepublication' || n.includes('specialsize')) {
+        return 'z';
+      }
+      if (n === 'accompanyingmaterials' || n === 'accompanyingmaterial' || n.includes('accompanying') || n.includes('acom')) {
+        return 'acom';
+      }
+
+      return 'normal';
+    }
+
     function parseCutters(rawCutterStr) {
       if (!rawCutterStr) return [];
 
@@ -1139,55 +1664,19 @@
       return cutterLines;
     }
 
-    function generateLabel(fromModeChange = false) {
-      const inputEl = document.getElementById('callNumberInput');
-      let rawInput = inputEl.value;
-
-      if (!rawInput.trim() && fromModeChange && lastRawInput) {
-        rawInput = lastRawInput;
-      }
-
-      const rawDisplayEl = document.getElementById('rawInputDisplay');
-
-      let str = rawInput.trim();
-      if (!str) {
-        setPreview('กรุณากรอกข้อมูล', true);
-        if (rawDisplayEl) {
-          rawDisplayEl.innerHTML = '';
-          rawDisplayEl.classList.remove('show');
-        }
-        return;
-      }
-
-      lastRawInput = str;
-
-      // กดสร้างใหม่ → รีเซ็ตขนาดเป็น 100% ยกเว้นล็อกไว้ หรือแค่เปลี่ยนประเภทหนังสือ
-      if (!fromModeChange && !scaleLocked && currentScale !== 100) {
-        updateFontScale(100, false);
-      }
-
-      if (rawDisplayEl) {
-        rawDisplayEl.innerHTML = 'จาก Call No.: <span>' + escapeHtml(str) + '</span>';
-        rawDisplayEl.classList.add('show');
-      }
-
-      inputEl.value = '';
-
-      // ตัดสัญลักษณ์ MARC Delimiter (เช่น ▼a, $a, ‡a) ออกอัตโนมัติ
+    function computeLabelHtml(str, mode) {
+      const modeToUse = mode || currentMode;
       str = str.replace(/[▼$‡|][a-zA-Z0-9\u0E00-\u0E7F]/g, ' ').trim();
 
       let lines = [];
 
-      // กรณีมีคำว่า CRE หรือขึ้นต้นด้วย CRE
       if (/CRE/i.test(str)) {
-        // ทำความสะอาดข้อความ ตัด Prefix เดิมและคำว่า CRE ออก
         let clean = str
           .replace(/^(Ra|ก|อ|R|วพ|T|ACOM|Rew|Z|คส)\s+/i, '')
           .replace(/^CRE[\s\.\/\:]*/i, '')
           .replace(/[\s\.\/\:]*CRE[\s\.\/\:]*/i, ' ')
           .trim();
 
-        // แยกส่วนประกอบย่อยของ CRE (ปีพิมพ์, เลขทะเบียน, เล่ม/ฉบับ)
         const tokens = clean.split(/[\s\/]+/).filter(t => t.length > 0);
         let year = '', accession = '', volParts = [];
 
@@ -1201,12 +1690,11 @@
           }
         }
 
-        // สำหรับประเภท "ทั่วไป / CRE" (normal) และ "หายาก" (rare) ให้เพิ่ม Ra เป็นบรรทัดบนสุดเสมอ
         let prefix = null;
-        if (currentMode === 'normal' || currentMode === 'rare') {
+        if (modeToUse === 'normal' || modeToUse === 'rare') {
           prefix = 'Ra';
         } else {
-          prefix = getPrefixForMode(currentMode, str);
+          prefix = getPrefixForMode(modeToUse, str);
         }
 
         lines = prefix ? [prefix, 'CRE'] : ['CRE'];
@@ -1215,7 +1703,7 @@
         if (accession) lines.push(accession);
         if (volParts.length > 0) lines.push(volParts.join(' '));
       } else {
-        const prefixLine = getPrefixForMode(currentMode, str);
+        const prefixLine = getPrefixForMode(modeToUse, str);
         str = str.replace(/^(Ra|ก|อ|R|วพ|T|ACOM|Rew|Z|คส)\s+/i, '');
 
         const ficMatch = str.match(/^(นว|Fic|กต|Comic)[\s\.]*/i);
@@ -1241,7 +1729,6 @@
           }
         }
 
-        // 1. หาตำแหน่ง Cutter ตัวแรกใน str (รองรับทั้งตัวอักษรไทย อังกฤษ และจุด)
         const cutterFinderRegex = /(?:^|[\s\.\/])([A-Za-z\u0E00-\u0E7F]+\d+)/g;
         let firstCutterIdx = -1;
         let mCutter;
@@ -1253,7 +1740,6 @@
           }
         }
 
-        // 2. ค้นหาปีพิมพ์ (Publication Year)
         const monthRegexStr = `(?:ม\\.ค\\.?|ก\\.พ\\.?|มี\\.ค\\.?|เม\\.ย\\.?|พ\\.ค\\.?|มิ\\.ย\\.?|ก\\.ค\\.?|ส\\.ค\\.?|ก\\.ย\\.?|ต\\.ค\\.?|พ\\.ย\\.?|ธ\\.ค\\.?|มกราคม|กุมภาพันธ์|มีนาคม|เมษายน|พฤษภาคม|มิถุนายน|กรกฎาคม|สิงหาคม|กันยายน|ตุลาคม|พฤศจิกายน|ธันวาคม|Jan[a-zA-Z]*\\.?|Feb[a-zA-Z]*\\.?|Mar[a-zA-Z]*\\.?|Apr[a-zA-Z]*\\.?|May[a-zA-Z]*\\.?|Jun[a-zA-Z]*\\.?|Jul[a-zA-Z]*\\.?|Aug[a-zA-Z]*\\.?|Sep[a-zA-Z]*\\.?|Sept[a-zA-Z]*\\.?|Oct[a-zA-Z]*\\.?|Nov[a-zA-Z]*\\.?|Dec[a-zA-Z]*\\.?)`;
         const yearRegexStr = `(?:(?:1[89]\\d{2}|20\\d{2}|2[345]\\d{2})(?:-(?:[12]\\d{3}|\\d{2}))?(?:[a-zA-Z\\u0E00-\\u0E7F](?![a-zA-Z\\u0E00-\\u0E7F]))?)`;
 
@@ -1293,21 +1779,30 @@
           restAfterYear = str.substring(pubYearMatch.index + pubYearMatch.length).trim();
         }
 
-        const monthPattern = new RegExp(`(?:${monthRegexStr}(?:\\s*-\\s*${monthRegexStr})?)`, 'i');
+        const monthPattern = new RegExp(`(?:${monthRegexStr}(?:\\s*[-–—]\\s*${monthRegexStr})?)`, 'i');
         let monthStr = '';
-        const monthMatchAfter = restAfterYear.match(monthPattern);
-        if (monthMatchAfter) {
-          monthStr = monthMatchAfter[0];
-          restAfterYear = (restAfterYear.substring(0, monthMatchAfter.index) + ' ' + restAfterYear.substring(monthMatchAfter.index + monthStr.length)).trim();
-        } else {
-          const monthMatchBefore = restBeforeYear.match(monthPattern);
-          if (monthMatchBefore) {
-            monthStr = monthMatchBefore[0];
-            restBeforeYear = (restBeforeYear.substring(0, monthMatchBefore.index) + ' ' + restBeforeYear.substring(monthMatchBefore.index + monthStr.length)).trim();
-           }
+
+        // ถ้าปีมีเดือนติดอยู่ด้วย เช่น "ก.ย. 2569" ให้แยกเดือนออกจากปี
+        if (year) {
+          const yearMonthMatch = year.match(monthPattern);
+          if (yearMonthMatch) {
+            monthStr = yearMonthMatch[0];
+            year = year.replace(monthPattern, '').trim();
+          }
         }
-        if (monthStr && /[\u0E00-\u0E7F]\.[\u0E00-\u0E7F]$/.test(monthStr)) {
-          monthStr += '.';
+
+        if (!monthStr) {
+          const monthMatchAfter = restAfterYear.match(monthPattern);
+          if (monthMatchAfter) {
+            monthStr = monthMatchAfter[0];
+            restAfterYear = (restAfterYear.substring(0, monthMatchAfter.index) + ' ' + restAfterYear.substring(monthMatchAfter.index + monthStr.length)).trim();
+          } else {
+            const monthMatchBefore = restBeforeYear.match(monthPattern);
+            if (monthMatchBefore) {
+              monthStr = monthMatchBefore[0];
+              restBeforeYear = (restBeforeYear.substring(0, monthMatchBefore.index) + ' ' + restBeforeYear.substring(monthMatchBefore.index + monthStr.length)).trim();
+            }
+          }
         }
 
         let preCutterAndCutterStr = restBeforeYear;
@@ -1369,15 +1864,533 @@
         lines.push(...volPartLines);
       }
 
-      if (lines.length > 7) {
-        const top6 = lines.slice(0, 6);
-        const rest = lines.slice(6).join(' ');
-        lines = [...top6, rest];
+      if (lines.length > 8) {
+        const top7 = lines.slice(0, 7);
+        const rest = lines.slice(7).join(' ');
+        lines = [...top7, rest];
       }
 
       lines = lines.map(line => line.includes('class="year-line"') ? line : escapeHtml(line.trim()));
 
-      setPreview(lines.join('\n'), false);
+      return lines.join('\n');
+    }
+
+    function generateLabel(fromModeChange = false) {
+      const inputEl = document.getElementById('callNumberInput');
+      let rawInput = inputEl.value;
+      const typedNew = !!rawInput.trim();
+
+      if (!typedNew && fromModeChange && lastRawInput) {
+        rawInput = lastRawInput;
+      }
+
+      let str = rawInput.trim();
+      if (!str) {
+        setPreview('กรุณากรอกข้อมูล', true);
+        showRawInput('');
+        return;
+      }
+
+      lastRawInput = str;
+      inputEl.value = '';
+
+      const html = computeLabelHtml(str, currentMode);
+
+      if (fromModeChange && currentIdx >= 0 && queue[currentIdx]) {
+        queue[currentIdx].html = html;
+        queue[currentIdx].raw = str;
+        queue[currentIdx].mode = currentMode;
+      } else {
+        currentIdx = -1;
+        const target = scaleLocked ? lockedScale : 100;
+        if (currentScale !== target) updateFontScale(target, false);
+      }
+
+      showRawInput(str);
+      setPreview(html, false);
+      renderQueue();
+    }
+
+    /* ---------- คิวพิมพ์ ---------- */
+    function markOver(over) {
+      const it = queue[currentIdx];
+      if (it && it.over !== over) {
+        it.over = over;
+        renderQueue();
+      }
+    }
+
+    function plainLines(html) {
+      return html.replace(/<[^>]*>/g, '').split('\n');
+    }
+
+    function renderQueue() {
+      const list = document.getElementById('queueList');
+      if (!list) return;
+      const n = queue.length;
+      const totalCopies = queue.reduce((sum, item) => sum + (item.qty || 1), 0);
+
+      document.getElementById('queueCount').textContent = totalCopies;
+      document.getElementById('printAllBtn').disabled = n === 0;
+      document.getElementById('queueClear').disabled = n === 0;
+      document.getElementById('printAllText').textContent =
+        totalCopies > 1 ? 'พิมพ์ทั้งหมด (' + totalCopies + ')' : 'พิมพ์ทั้งหมด';
+      document.getElementById('queueHint').textContent = n
+        ? 'แตะรายการเพื่อดู/ปรับขนาดตัวอักษร หรือกดปุ่ม +/- เพื่อปรับจำนวนแผ่น แล้วกด “พิมพ์ทั้งหมด”'
+        : 'ยังไม่มี label ในคิว สามารถนำเข้าจากไฟล์ Excel (หรือลากไฟล์มาวางในหน้านี้) เพื่อเพิ่มลงในคิวพิมพ์';
+
+      list.innerHTML = queue.map((it, i) => {
+        const text = plainLines(it.html).join(' · ');
+        const qty = it.qty || 1;
+        const badge = it.over
+          ? '<span class="q-badge warn">เกินขอบ</span>'
+          : (it.scale !== 100 ? '<span class="q-badge">' + it.scale + '%</span>' : '');
+        return '<li class="q-item' + (i === currentIdx ? ' is-current' : '') + '">' +
+          '<button type="button" class="q-pick" onclick="selectItem(' + i + ')">' +
+            '<span class="q-num">' + (i + 1) + '</span>' +
+            '<span class="q-main"><span class="q-text">' + text + '</span>' +
+              (it.title ? '<span class="q-sub">' + escapeHtml(it.title) + '</span>' : '') + '</span>' + badge +
+          '</button>' +
+          '<div class="q-qty-ctrl" aria-label="ปรับจำนวนพิมพ์">' +
+            '<button type="button" class="q-qty-btn" aria-label="ลดจำนวน" onclick="changeQty(event, ' + i + ', -1)"' + (qty <= 1 ? ' disabled' : '') + '>-</button>' +
+            '<span class="q-qty-num" title="จำนวนแผ่น">' + qty + '</span>' +
+            '<button type="button" class="q-qty-btn" aria-label="เพิ่มจำนวน" onclick="changeQty(event, ' + i + ', 1)">+</button>' +
+          '</div>' +
+          '<button type="button" class="q-del" aria-label="ลบรายการที่ ' + (i + 1) + '" onclick="removeItem(' + i + ')">' +
+            '<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>' +
+          '</button></li>';
+      }).join('');
+
+      const cur = list.querySelector('.is-current');
+      if (cur) {
+        const top = cur.offsetTop, bottom = top + cur.offsetHeight;
+        if (top < list.scrollTop) list.scrollTop = top;
+        else if (bottom > list.scrollTop + list.clientHeight) list.scrollTop = bottom - list.clientHeight;
+      }
+    }
+
+    function changeQty(event, i, delta) {
+      if (event) event.stopPropagation();
+      if (!queue[i]) return;
+      const currentQty = queue[i].qty || 1;
+      queue[i].qty = Math.max(1, currentQty + delta);
+      renderQueue();
+    }
+
+    function showMode(mode) {
+      currentMode = mode;
+      document.querySelectorAll('.seg-btn').forEach(btn => {
+        const on = btn.dataset.mode === mode;
+        btn.classList.toggle('active-mode', on);
+        btn.setAttribute('aria-checked', on ? 'true' : 'false');
+        btn.tabIndex = on ? 0 : -1;
+      });
+      document.getElementById('modeHint').textContent = MODE_HINTS[mode] || '';
+    }
+
+    function showRawInput(raw) {
+      const el = document.getElementById('rawInputDisplay');
+      if (!el) return;
+      if (raw) {
+        el.innerHTML = '<span class="raw-input-text">จาก Call No.: <span class="raw-val">' + escapeHtml(raw) + '</span></span>';
+        el.classList.add('show');
+      } else {
+        el.innerHTML = '';
+        el.classList.remove('show');
+      }
+    }
+
+    /* ---------- Toast + เลิกทำการลบ ---------- */
+    function showToast(text) {
+      document.getElementById('toastText').textContent = text;
+      document.getElementById('toast').classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(hideToast, 7000);
+    }
+
+    function hideToast() {
+      clearTimeout(toastTimer);
+      document.getElementById('toast').classList.remove('show');
+    }
+
+    function undoRemove() {
+      if (!removedItem) return;
+      const { item, index, wasCurrent } = removedItem;
+      removedItem = null;
+      hideToast();
+      const at = Math.min(index, queue.length);
+      queue.splice(at, 0, item);
+      if (wasCurrent || currentIdx < 0) {
+        selectItem(at);
+      } else {
+        if (at <= currentIdx) currentIdx++;
+        renderQueue();
+      }
+    }
+
+    function selectItem(i) {
+      const it = queue[i];
+      if (!it) return;
+      currentIdx = -1;
+      lastRawInput = it.raw;
+      showMode(it.mode);
+      updateFontScale(it.scale, false);
+      setPreview(it.html, false);
+      currentIdx = i;
+      showRawInput(it.raw);
+      checkFit();
+      renderQueue();
+    }
+
+    function resetPreviewEmpty() {
+      currentIdx = -1;
+      lastRawInput = '';
+      setPreview('ผลลัพธ์จะแสดงที่นี่', true);
+      showRawInput('');
+      renderQueue();
+    }
+
+    function removeItem(i) {
+      if (!queue[i]) return;
+      const removed = queue[i];
+      const wasCurrent = (i === currentIdx);
+
+      queue.splice(i, 1);
+      if (!queue.length) {
+        if (wasCurrent) resetPreviewEmpty();
+        else renderQueue();
+      } else if (i === currentIdx) {
+        selectItem(Math.min(i, queue.length - 1));
+      } else {
+        if (i < currentIdx) currentIdx--;
+        renderQueue();
+      }
+
+      removedItem = { item: removed, index: i, wasCurrent };
+      showToast('ลบแล้ว: ' + plainLines(removed.html).join(' '));
+    }
+
+    function clearQueue() {
+      if (!queue.length) return;
+      if (!window.confirm('ล้างคิวพิมพ์ทั้งหมด ' + queue.length + ' รายการ?')) return;
+      removedItem = null;
+      hideToast();
+      queue = [];
+      if (currentIdx >= 0) {
+        resetPreviewEmpty();
+      } else {
+        renderQueue();
+      }
+    }
+
+    function buildPrintSheet() {
+      let printHtml = '';
+      queue.forEach(it => {
+        const count = it.qty || 1;
+        for (let c = 0; c < count; c++) {
+          printHtml += '<div class="print-label"><div class="pl-text" data-lines="' + plainLines(it.html).length +
+            '" style="--font-scale:' + (it.scale / 100) + '">' + it.html + '</div></div>';
+        }
+      });
+      document.getElementById('printSheet').innerHTML = printHtml;
+    }
+
+    function printAll() {
+      if (!queue.length) return;
+      buildPrintSheet();
+      document.documentElement.classList.add('print-all');
+      window.print();
+    }
+
+    window.addEventListener('afterprint', () => {
+      document.documentElement.classList.remove('print-all');
+    });
+
+    /* ---------- นำเข้าจากไฟล์ (xlsx / csv) ---------- */
+    function decodeXml(s) {
+      return s
+        .replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+        .replace(/&quot;/g, '"').replace(/&apos;/g, "'")
+        .replace(/&#(\d+);/g, (_, n) => String.fromCodePoint(+n))
+        .replace(/&#x([0-9a-fA-F]+);/g, (_, h) => String.fromCodePoint(parseInt(h, 16)))
+        .replace(/&amp;/g, '&');
+    }
+
+    function xmlText(x) {
+      x = x.replace(/<rPh\b[\s\S]*?<\/rPh>/g, '');
+      let out = '', m;
+      const re = /<t\b[^>]*>([\s\S]*?)<\/t>/g;
+      while ((m = re.exec(x))) out += m[1];
+      return decodeXml(out);
+    }
+
+    async function inflateRaw(bytes) {
+      const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream('deflate-raw'));
+      return new Uint8Array(await new Response(stream).arrayBuffer());
+    }
+
+    async function readZip(buf) {
+      const u8 = new Uint8Array(buf);
+      const dv = new DataView(buf);
+      const dec = new TextDecoder();
+      let eocd = -1;
+      for (let i = u8.length - 22; i >= Math.max(0, u8.length - 65557); i--) {
+        if (dv.getUint32(i, true) === 0x06054b50) { eocd = i; break; }
+      }
+      if (eocd < 0) throw new Error('ไฟล์นี้ไม่ใช่ไฟล์ .xlsx ที่ถูกต้อง');
+
+      const count = dv.getUint16(eocd + 10, true);
+      let p = dv.getUint32(eocd + 16, true);
+      const files = {};
+      for (let n = 0; n < count; n++) {
+        if (dv.getUint32(p, true) !== 0x02014b50) break;
+        const nlen = dv.getUint16(p + 28, true);
+        const elen = dv.getUint16(p + 30, true);
+        const clen = dv.getUint16(p + 32, true);
+        files[dec.decode(u8.subarray(p + 46, p + 46 + nlen))] = {
+          method: dv.getUint16(p + 10, true),
+          csize: dv.getUint32(p + 20, true),
+          off: dv.getUint32(p + 42, true)
+        };
+        p += 46 + nlen + elen + clen;
+      }
+
+      return {
+        names: Object.keys(files),
+        async read(name) {
+          const f = files[name];
+          if (!f) return null;
+          const start = f.off + 30 + dv.getUint16(f.off + 26, true) + dv.getUint16(f.off + 28, true);
+          const data = u8.subarray(start, start + f.csize);
+          return dec.decode(f.method === 0 ? data : await inflateRaw(data));
+        }
+      };
+    }
+
+    function colIndex(letters) {
+      let n = 0;
+      for (const ch of letters) n = n * 26 + (ch.charCodeAt(0) - 64);
+      return n - 1;
+    }
+
+    async function parseXlsx(buf) {
+      const zip = await readZip(buf);
+
+      let sheetPath = null;
+      const wb = await zip.read('xl/workbook.xml');
+      const rels = await zip.read('xl/_rels/workbook.xml.rels');
+      if (wb && rels) {
+        const sm = wb.match(/<sheet\b[^>]*?\br:id="([^"]+)"/);
+        if (sm) {
+          const tag = rels.match(new RegExp('<Relationship\\b[^>]*\\bId="' + sm[1] + '"[^>]*>'));
+          const tm = tag && tag[0].match(/\bTarget="([^"]+)"/);
+          if (tm) sheetPath = tm[1].replace(/^\//, '');
+          if (sheetPath && !sheetPath.startsWith('xl/')) sheetPath = 'xl/' + sheetPath;
+        }
+      }
+      if (!sheetPath || !zip.names.includes(sheetPath)) {
+        sheetPath = zip.names.find(n => /^xl\/worksheets\/sheet\d+\.xml$/.test(n));
+      }
+      if (!sheetPath) throw new Error('ไม่พบข้อมูลในไฟล์ Excel นี้');
+
+      const shared = [];
+      const ssXml = await zip.read('xl/sharedStrings.xml');
+      if (ssXml) {
+        const re = /<si\b[^>]*?(?:\/>|>([\s\S]*?)<\/si>)/g;
+        let m;
+        while ((m = re.exec(ssXml))) shared.push(m[1] === undefined ? '' : xmlText(m[1]));
+      }
+
+      const sheet = await zip.read(sheetPath);
+      const grid = [];
+      const re = /<c\b([^>]*?)(?:\/>|>([\s\S]*?)<\/c>)/g;
+      let m;
+      while ((m = re.exec(sheet))) {
+        if (m[2] === undefined) continue;
+        const ref = m[1].match(/\br="([A-Z]+)(\d+)"/);
+        if (!ref) continue;
+        const type = (m[1].match(/\bt="([^"]+)"/) || [])[1];
+        let val = '';
+        if (type === 'inlineStr') {
+          val = xmlText(m[2]);
+        } else {
+          const v = m[2].match(/<v>([\s\S]*?)<\/v>/);
+          if (v) val = type === 's' ? (shared[+v[1]] || '') : decodeXml(v[1]);
+        }
+        const r = +ref[2] - 1;
+        (grid[r] = grid[r] || [])[colIndex(ref[1])] = val;
+      }
+      return Array.from(grid, row => Array.from(row || [], c => (c == null ? '' : c)));
+    }
+
+    function parseCsv(text, delim) {
+      text = text.replace(/^﻿/, '');
+      const rows = [];
+      let row = [], cur = '', q = false;
+      for (let i = 0; i < text.length; i++) {
+        const ch = text[i];
+        if (q) {
+          if (ch === '"') {
+            if (text[i + 1] === '"') { cur += '"'; i++; } else q = false;
+          } else cur += ch;
+        } else if (ch === '"') {
+          q = true;
+        } else if (ch === delim) {
+          row.push(cur); cur = '';
+        } else if (ch === '\n' || ch === '\r') {
+          if (ch === '\r' && text[i + 1] === '\n') i++;
+          row.push(cur); cur = '';
+          rows.push(row); row = [];
+        } else cur += ch;
+      }
+      if (cur !== '' || row.length) { row.push(cur); rows.push(row); }
+      return rows;
+    }
+
+    function measureOver(html, scale) {
+      const frame = document.getElementById('measureFrame');
+      const el = document.getElementById('measurePreview');
+      if (!frame || !el) return false;
+      el.innerHTML = html;
+      el.setAttribute('data-lines', plainLines(html).length);
+      el.style.setProperty('--font-scale', scale / 100);
+      return !labelFits(frame, el);
+    }
+
+    function addRowsToQueue(rows, fileName) {
+      const norm = s => String(s == null ? '' : s).toLowerCase().replace(/[\s.]/g, '');
+      const CALL_HEADERS = ['callno', 'เลขเรียกหนังสือ', 'เลขเรียก'];
+
+      let hdr = -1, callCol = -1, titleCol = -1, colCol = -1;
+      for (let r = 0; r < Math.min(rows.length, 15) && hdr < 0; r++) {
+        const idx = rows[r].findIndex(c => CALL_HEADERS.includes(norm(c)));
+        if (idx >= 0) {
+          hdr = r;
+          callCol = idx;
+          titleCol = rows[r].findIndex(c => norm(c) === 'title' || norm(c) === 'ชื่อเรื่อง');
+          colCol = rows[r].findIndex(c => {
+            const n = norm(c);
+            return n.includes('collection') || n.includes('คอลเลก') || n.includes('คอลเล็ก') || n === 'location';
+          });
+        }
+      }
+      if (hdr < 0) {
+        throw new Error('ไม่พบคอลัมน์ “Call No.” ในไฟล์ (แถวหัวตารางต้องมีคำว่า Call No.)');
+      }
+
+      const scale = scaleLocked ? lockedScale : 100;
+      let added = 0, skipped = 0, over = 0;
+      for (let r = hdr + 1; r < rows.length; r++) {
+        const row = rows[r] || [];
+        if (row.every(c => !String(c == null ? '' : c).trim())) continue;
+        const raw = String(row[callCol] == null ? '' : row[callCol]).trim();
+        const collectionRaw = colCol >= 0 ? String(row[colCol] == null ? '' : row[colCol]).trim() : '';
+        const itemMode = getModeFromCollection(collectionRaw);
+
+        const html = raw ? computeLabelHtml(raw, itemMode) : '';
+        if (!html.trim()) { skipped++; continue; }
+        const isOver = measureOver(html, scale);
+        if (isOver) over++;
+        queue.push({
+          html, raw, mode: itemMode, scale, over: isOver,
+          title: titleCol >= 0 ? String(row[titleCol] == null ? '' : row[titleCol]).replace(/\s+/g, ' ').trim() : '',
+          qty: 1
+        });
+        added++;
+      }
+
+      if (!added) throw new Error('ไม่พบเลข Call No. ที่ใช้สร้าง label ได้ในไฟล์');
+
+      let msg = 'นำเข้า “' + fileName + '” แล้ว ' + added + ' รายการ';
+      if (skipped) msg += ' · ข้าม ' + skipped + ' แถวที่ไม่มี Call No.';
+      if (over) msg += ' · มี ' + over + ' ใบที่ตัวอักษรเกินขอบ (ดูป้าย “เกินขอบ” ในคิว)';
+      return msg;
+    }
+
+    function setImportStatus(text, isError) {
+      const el = document.getElementById('importStatus');
+      if (!el) return;
+      el.textContent = text;
+      el.classList.toggle('is-error', !!isError);
+      el.hidden = !text;
+
+      clearTimeout(setImportStatus.timer);
+      if (text && !isError && text !== 'กำลังอ่านไฟล์…') {
+        setImportStatus.timer = setTimeout(() => { el.hidden = true; }, 10000);
+      }
+    }
+
+    async function importFile(file) {
+      const name = (file.name || '').toLowerCase();
+      try {
+        let rows;
+        if (/\.xls$/.test(name)) {
+          throw new Error('ไฟล์ .xls รุ่นเก่าไม่รองรับ กรุณาบันทึกเป็น .xlsx ก่อน');
+        } else if (/\.(xlsx|xlsm)$/.test(name)) {
+          rows = await parseXlsx(await file.arrayBuffer());
+        } else if (/\.(csv|tsv|txt)$/.test(name)) {
+          rows = parseCsv(await file.text(), /\.tsv$/.test(name) ? '\t' : ',');
+        } else {
+          throw new Error('รองรับเฉพาะไฟล์ .xlsx หรือ .csv');
+        }
+        return { ok: true, msg: addRowsToQueue(rows, file.name) };
+      } catch (e) {
+        return { ok: false, msg: '“' + file.name + '”: ' + (e && e.message ? e.message : 'อ่านไฟล์ไม่สำเร็จ') };
+      }
+    }
+
+    async function importFiles(fileList) {
+      const files = Array.from(fileList || []);
+      if (!files.length) return;
+      setImportStatus('กำลังอ่านไฟล์…', false);
+
+      const firstNew = queue.length;
+      const msgs = [];
+      let anyError = false;
+      for (const f of files) {
+        const res = await importFile(f);
+        msgs.push(res.msg);
+        if (!res.ok) anyError = true;
+      }
+
+      if (queue.length > firstNew) selectItem(firstNew);
+      else renderQueue();
+      setImportStatus(msgs.join('\n'), anyError);
+    }
+
+    function onFilesPicked(e) {
+      const input = e.target;
+      importFiles(input.files).then(() => { input.value = ''; });
+    }
+
+    function initDropImport() {
+      const btn = document.getElementById('dropBtn');
+      let depth = 0;
+      const hasFiles = e => e.dataTransfer && Array.from(e.dataTransfer.types || []).includes('Files');
+
+      document.addEventListener('dragenter', e => {
+        if (!hasFiles(e)) return;
+        e.preventDefault();
+        depth++;
+        btn.classList.add('is-drag');
+      });
+      document.addEventListener('dragover', e => {
+        if (!hasFiles(e)) return;
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'copy';
+      });
+      document.addEventListener('dragleave', e => {
+        if (!hasFiles(e)) return;
+        depth = Math.max(0, depth - 1);
+        if (!depth) btn.classList.remove('is-drag');
+      });
+      document.addEventListener('drop', e => {
+        if (!hasFiles(e)) return;
+        e.preventDefault();
+        depth = 0;
+        btn.classList.remove('is-drag');
+        importFiles(e.dataTransfer.files);
+      });
     }
 
     function handleKeyDown(event) {
@@ -1388,6 +2401,8 @@
     }
 
     initFontScale();
+    renderQueue();
+    initDropImport();
     initKeyboardShortcuts();
     detectPrintFont();
     if (document.fonts && document.fonts.ready) {
