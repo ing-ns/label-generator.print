@@ -1489,7 +1489,7 @@
 
             if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
               next = (activeIdx + 1) % btns.length;
-            } else {
+            } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
               next = (activeIdx - 1 + btns.length) % btns.length;
             }
 
@@ -1628,25 +1628,43 @@
       if (!rawCutterStr) return [];
 
       const cutterRegex = /\.?[A-Za-z\u0E00-\u0E7F]+\d+(?:[A-Za-z\u0E00-\u0E7F](?![0-9]))?/g;
-      let matches = rawCutterStr.match(cutterRegex);
-
-      if (!matches || matches.length === 0) {
-        matches = rawCutterStr.replace(/\./g, ' ').trim().split(/\s+/).filter(Boolean);
-      }
-
       const cutterLines = [];
       let currentLine = '';
       let currentCount = 0;
+      let lastIndex = 0;
+      let match;
 
-      for (let rawToken of matches) {
-        const token = rawToken.replace(/^\./, '').trim();
-        if (!token) continue;
+      const flushCutter = () => {
+        if (currentLine) {
+          cutterLines.push(currentLine);
+          currentLine = '';
+          currentCount = 0;
+        }
+      };
 
-        if (!currentLine) {
-          currentLine = token;
-          currentCount = 1;
-        } else {
-          if (currentCount + 1 <= 2) {
+      const pushExtraWords = (segment) => {
+        if (!segment) return;
+        const words = segment
+          .trim()
+          .split(/\s+/)
+          .map(w => w.replace(/^\.+/, '').trim())
+          .filter(w => w && w !== '/');
+        if (words.length > 0) {
+          flushCutter();
+          cutterLines.push(...words);
+        }
+      };
+
+      while ((match = cutterRegex.exec(rawCutterStr)) !== null) {
+        const gap = rawCutterStr.slice(lastIndex, match.index);
+        pushExtraWords(gap);
+
+        const token = match[0].replace(/^\./, '').trim();
+        if (token) {
+          if (!currentLine) {
+            currentLine = token;
+            currentCount = 1;
+          } else if (currentCount + 1 <= 2) {
             currentLine += token;
             currentCount += 1;
           } else {
@@ -1655,22 +1673,24 @@
             currentCount = 1;
           }
         }
+
+        lastIndex = match.index + match[0].length;
       }
 
-      if (currentLine) {
-        cutterLines.push(currentLine);
-      }
+      pushExtraWords(rawCutterStr.slice(lastIndex));
+      flushCutter();
 
       return cutterLines;
     }
 
     function computeLabelHtml(str, mode) {
       const modeToUse = mode || currentMode;
-      str = str.replace(/[▼$‡|][a-zA-Z0-9\u0E00-\u0E7F]/g, ' ').trim();
+      // ตัดเฉพาะเครื่องหมาย ▼ ที่ตามด้วยตัวอักษร (เช่น ▼b) ออก ส่วนข้อความอื่นๆ คงไว้ทั้งหมด
+      str = str.replace(/▼[a-zA-Z\u0E00-\u0E7F]/g, ' ').replace(/\s+/g, ' ').trim();
 
       let lines = [];
 
-      if (/CRE/i.test(str)) {
+      if (/(?:^|[\s\.\/:])CRE(?:$|[\s\.\/:])/i.test(str)) {
         let clean = str
           .replace(/^(Ra|ก|อ|R|วพ|T|ACOM|Rew|Z|คส)\s+/i, '')
           .replace(/^CRE[\s\.\/\:]*/i, '')
@@ -1807,18 +1827,29 @@
 
         let preCutterAndCutterStr = restBeforeYear;
         let volPartLines = [];
-        let extraCutterFromAfterYear = '';
+        let afterYearWords = [];
 
         if (restAfterYear) {
           const volPartRegexGlobal = /(?:ล\.|เล่ม|v\.|V\.|c\.|C\.|bd\.|vol\.|Vol\.|ฉ\.|ต\.|ตอน|pt\.|Pt\.|part|Part|ค\.)\s*\d+[a-zA-Z\u0E00-\u0E7F]*/gi;
           const volMatches = restAfterYear.match(volPartRegexGlobal) || [];
           volPartLines = volMatches.map(v => v.trim());
 
-          extraCutterFromAfterYear = restAfterYear.replace(volPartRegexGlobal, ' ').replace(/\s+/g, ' ').trim();
-        }
-
-        if (extraCutterFromAfterYear) {
-          preCutterAndCutterStr = (preCutterAndCutterStr + ' ' + extraCutterFromAfterYear).trim();
+          const leftoverAfterYear = restAfterYear.replace(volPartRegexGlobal, ' ').replace(/\s+/g, ' ').trim();
+          if (leftoverAfterYear) {
+            const cutterTokenCheck = /^\.?[A-Za-z\u0E00-\u0E7F]+\d+(?:[A-Za-z\u0E00-\u0E7F](?![0-9]))?$/;
+            const leftoverTokens = leftoverAfterYear.split(/\s+/).filter(Boolean);
+            const extraCutters = [];
+            for (const tok of leftoverTokens) {
+              if (cutterTokenCheck.test(tok)) {
+                extraCutters.push(tok);
+              } else {
+                afterYearWords.push(tok.replace(/^\.+/, ''));
+              }
+            }
+            if (extraCutters.length > 0) {
+              preCutterAndCutterStr = (preCutterAndCutterStr + ' ' + extraCutters.join(' ')).trim();
+            }
+          }
         }
 
         if (!year && !monthStr && volPartLines.length === 0) {
@@ -1861,6 +1892,7 @@
         lines.push(...cutterLines);
         if (year) lines.push('<span class="year-line">' + escapeHtml(year) + '</span>');
         if (monthStr) lines.push(monthStr);
+        lines.push(...afterYearWords.filter(Boolean));
         lines.push(...volPartLines);
       }
 
