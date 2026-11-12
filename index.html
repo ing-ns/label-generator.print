@@ -1889,13 +1889,14 @@
         lines.push(...volPartLines);
       }
 
-      if (lines.length > 8) {
-        const top7 = lines.slice(0, 7);
-        const rest = lines.slice(7).join(' ');
-        lines = [...top7, rest];
-      }
-
       lines = lines.map(line => line.includes('class="year-line"') ? line : escapeHtml(line.trim()));
+
+      // จำกัดไม่เกิน 7 บรรทัด ถ้าเกินให้นำข้อความตั้งแต่บรรทัดที่ 8 เป็นต้นไปมาต่อท้ายบรรทัดที่ 7
+      if (lines.length > 7) {
+        const top6 = lines.slice(0, 6);
+        const rest = lines.slice(6).join(' ');
+        lines = [...top6, rest];
+      }
 
       return lines.join('\n');
     }
