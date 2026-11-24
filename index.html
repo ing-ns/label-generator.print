@@ -1150,7 +1150,7 @@
         <button type="button" class="seg-btn" data-mode="z" role="radio" aria-checked="false" tabindex="-1" onclick="setMode('z', true)"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 8h8l-8 8h8"/></svg><span>Z</span></button>
         <button type="button" class="seg-btn" data-mode="ks" role="radio" aria-checked="false" tabindex="-1" onclick="setMode('ks', true)"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg><span>คส</span></button>
       </div>
-      <p class="mode-hint" id="modeHint">รวมถึงนิยาย / การ์ตูน / DOC</p>
+      <p class="mode-hint" id="modeHint">รวมถึงนิยาย / การ์ตูน / เยาวชน / DOC</p>
 
       <div class="entry">
         <label class="field-label" for="callNumberInput">เลขเรียกหนังสือ</label>
@@ -1528,7 +1528,7 @@
     }
 
     const MODE_HINTS = {
-      normal: 'รวมถึงนิยาย / การ์ตูน / DOC',
+      normal: 'รวมถึงนิยาย / การ์ตูน / เยาวชน / DOC',
       rare:   'หนังสือหายาก (Rare Book)',
       ref:    'หนังสืออ้างอิง (Reference Book)',
       thesis: 'วิทยานิพนธ์ (Thesis)',
@@ -1726,7 +1726,7 @@
         const prefixLine = getPrefixForMode(modeToUse, str);
         str = str.replace(/^(Ra|ก|อ|R|วพ|T|ACOM|Rew|Z|คส)\s+/i, '');
 
-        const ficMatch = str.match(/^(นว|Fic|กต|Comic)[\s\.]*/i);
+        const ficMatch = str.match(/^(นว|Fic|กต|Comic|JUL|ยน)[\s\.]*/i);
         let ficPrefix = null;
         if (ficMatch) {
           ficPrefix = ficMatch[1];
@@ -2437,3 +2437,4 @@
   </script>
 </body>
 </html>
+```[cite: 1]
