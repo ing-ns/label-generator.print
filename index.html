@@ -1624,65 +1624,6 @@
       return 'normal';
     }
 
-    function parseCutters(rawCutterStr) {
-      if (!rawCutterStr) return [];
-
-      const cutterRegex = /\.?[A-Za-z\u0E00-\u0E7F]+\d+(?:[A-Za-z\u0E00-\u0E7F](?![0-9]))?/g;
-      const cutterLines = [];
-      let currentLine = '';
-      let currentCount = 0;
-      let lastIndex = 0;
-      let match;
-
-      const flushCutter = () => {
-        if (currentLine) {
-          cutterLines.push(currentLine);
-          currentLine = '';
-          currentCount = 0;
-        }
-      };
-
-      const pushExtraWords = (segment) => {
-        if (!segment) return;
-        const words = segment
-          .trim()
-          .split(/\s+/)
-          .map(w => w.replace(/^\.+/, '').trim())
-          .filter(w => w && w !== '/');
-        if (words.length > 0) {
-          flushCutter();
-          cutterLines.push(...words);
-        }
-      };
-
-      while ((match = cutterRegex.exec(rawCutterStr)) !== null) {
-        const gap = rawCutterStr.slice(lastIndex, match.index);
-        pushExtraWords(gap);
-
-        const token = match[0].replace(/^\./, '').trim();
-        if (token) {
-          if (!currentLine) {
-            currentLine = token;
-            currentCount = 1;
-          } else if (currentCount + 1 <= 2) {
-            currentLine += token;
-            currentCount += 1;
-          } else {
-            cutterLines.push(currentLine);
-            currentLine = token;
-            currentCount = 1;
-          }
-        }
-
-        lastIndex = match.index + match[0].length;
-      }
-
-      pushExtraWords(rawCutterStr.slice(lastIndex));
-      flushCutter();
-
-      return cutterLines;
-    }
-
     function computeLabelHtml(str, mode) {
       const modeToUse = mode || currentMode;
       // ตัดเฉพาะเครื่องหมาย ▼ ที่ตามด้วยตัวอักษร (เช่น ▼b) ออก ส่วนข้อความอื่นๆ คงไว้ทั้งหมด
@@ -1724,169 +1665,148 @@
         if (volParts.length > 0) lines.push(volParts.join(' '));
       } else {
         const prefixLine = getPrefixForMode(modeToUse, str);
-        str = str.replace(/^(Ra|ก|อ|R|วพ|T|ACOM|Rew|Z|คส)\s+/i, '');
+        if (prefixLine) lines.push(prefixLine);
 
-        const ficMatch = str.match(/^(นว|Fic|กต|Comic|JUL|ยน)[\s\.]*/i);
-        let ficPrefix = null;
+        // ตัดคำนำหน้าประเภทหนังสือที่ติดมาในข้อความออก (เพราะระบบเติมให้จากปุ่มประเภทแล้ว)
+        str = str.replace(/^(Ra|ก|อ|R|วพ|T|ACOM|Rew|Z|คส)\s+/i, '').trim();
+
+        // 1. ตรวจสอบคำขึ้นต้นหมวดพิเศษ (นิยาย / การ์ตูน / เยาวชน) ที่ตำแหน่งเริ่มต้น
+        const ficMatch = str.match(/^(นว|Fic|กต|Comic|JUL|ยน)(?:[\s\.]+|$)/i);
         if (ficMatch) {
-          ficPrefix = ficMatch[1];
+          lines.push(ficMatch[1]);
           str = str.substring(ficMatch[0].length).trim();
-        }
-
-        let classPrefix = '', classNum = '';
-        if (!ficPrefix) {
+        } else {
+          // 2. ตรวจสอบเลขหมู่ระบบ LC (ตัวอักษร + ตัวเลข) หรือระบบทศนิยมดิวอี้ ที่ตำแหน่งเริ่มต้น
           const classMatch = str.match(/^([A-Za-z\u0E00-\u0E7F]+)\s*(\d+(?:\.\d+)?)/);
           if (classMatch) {
-            classPrefix = classMatch[1];
-            classNum = classMatch[2];
+            lines.push(classMatch[1]);
+            lines.push(classMatch[2]);
             str = str.substring(classMatch[0].length).trim();
           } else {
             const deweyMatch = str.match(/^(\d{3}(?:\.\d+)?)/);
             if (deweyMatch) {
-              classNum = deweyMatch[1];
+              lines.push(deweyMatch[1]);
               str = str.substring(deweyMatch[0].length).trim();
             }
           }
         }
 
-        const cutterFinderRegex = /(?:^|[\s\.\/])([A-Za-z\u0E00-\u0E7F]+\d+)/g;
-        let firstCutterIdx = -1;
-        let mCutter;
-        while ((mCutter = cutterFinderRegex.exec(str)) !== null) {
-          const matchedToken = mCutter[1];
-          if (/^[A-Za-z\u0E00-\u0E7F]/.test(matchedToken)) {
-            firstCutterIdx = mCutter.index + mCutter[0].indexOf(matchedToken);
-            break;
-          }
-        }
-
+        // 3. อ่านข้อความส่วนที่เหลือจากซ้ายไปขวาตามลำดับเดิม (ห้ามสลับตำแหน่งคำ)
         const monthRegexStr = `(?:ม\\.ค\\.?|ก\\.พ\\.?|มี\\.ค\\.?|เม\\.ย\\.?|พ\\.ค\\.?|มิ\\.ย\\.?|ก\\.ค\\.?|ส\\.ค\\.?|ก\\.ย\\.?|ต\\.ค\\.?|พ\\.ย\\.?|ธ\\.ค\\.?|มกราคม|กุมภาพันธ์|มีนาคม|เมษายน|พฤษภาคม|มิถุนายน|กรกฎาคม|สิงหาคม|กันยายน|ตุลาคม|พฤศจิกายน|ธันวาคม|Jan[a-zA-Z]*\\.?|Feb[a-zA-Z]*\\.?|Mar[a-zA-Z]*\\.?|Apr[a-zA-Z]*\\.?|May[a-zA-Z]*\\.?|Jun[a-zA-Z]*\\.?|Jul[a-zA-Z]*\\.?|Aug[a-zA-Z]*\\.?|Sep[a-zA-Z]*\\.?|Sept[a-zA-Z]*\\.?|Oct[a-zA-Z]*\\.?|Nov[a-zA-Z]*\\.?|Dec[a-zA-Z]*\\.?)`;
-        const yearRegexStr = `(?:(?:1[89]\\d{2}|20\\d{2}|2[345]\\d{2})(?:[-–—](?:[12]\\d{3}|\\d{2}))?(?:[a-zA-Z\\u0E00-\\u0E7F](?![a-zA-Z\\u0E00-\\u0E7F]))?)`;
+        const yearRegexStr = `(?:(?:1[89]\\d{2}|20\\d{2}|2[345]\\d{2})(?:[-–—\\/](?:[12]\\d{3}|\\d{2}))?(?:[a-zA-Z\\u0E00-\\u0E7F](?![a-zA-Z\\u0E00-\\u0E7F]))?)`;
+        const boundaryEnd = `(?=$|[\\s\\.\\/])`;
 
-        const yearPatterns = [
-          new RegExp(monthRegexStr + '\\s*' + yearRegexStr + '\\s*[-–—]\\s*' + monthRegexStr + '\\s*' + yearRegexStr, 'gi'),
-          new RegExp(monthRegexStr + '\\s*[-–—]\\s*' + monthRegexStr + '\\s*' + yearRegexStr, 'gi'),
-          new RegExp(monthRegexStr + '\\s*' + yearRegexStr, 'gi'),
-          new RegExp(`(?:^|[\\s\\.\\/])((?:1[89]\\d{2}|20\\d{2}|2[345]\\d{2})(?:[-–—](?:[12]\\d{3}|\\d{2}))?(?:[a-zA-Z\\u0E00-\\u0E7F](?![a-zA-Z\\u0E00-\\u0E7F]))?)(?=$|[\\s\\.\\/])`, 'gi')
+        const dateRangePatterns = [
+          new RegExp(`^(${monthRegexStr}\\s*${yearRegexStr}\\s*[-–—]\\s*${monthRegexStr}\\s*${yearRegexStr})${boundaryEnd}`, 'i'),
+          new RegExp(`^(${monthRegexStr}\\s*[-–—]\\s*${monthRegexStr}\\s*${yearRegexStr})${boundaryEnd}`, 'i'),
+          new RegExp(`^(${monthRegexStr}\\s*${yearRegexStr})${boundaryEnd}`, 'i')
         ];
+        const singleYearRegex = new RegExp(`^(${yearRegexStr})${boundaryEnd}`, 'i');
+        const monthOnlyRegex = new RegExp(`^(${monthRegexStr}(?:\\s*[-–—]\\s*${monthRegexStr})?)${boundaryEnd}`, 'i');
+        const volPartRegex = /^((?:ล\.|เล่ม|v\.|V\.|c\.|C\.|bd\.|vol\.|Vol\.|ฉ\.|ต\.|ตอน|pt\.|Pt\.|part|Part|ค\.)\s*\d+(?:[-–—]\d+)?[a-zA-Z\u0E00-\u0E7F]*)(?=$|[\s\.\/])/i;
+        const cutterRegex = /^\.?[A-Za-z\u0E00-\u0E7F]+\d+(?:[A-Za-z\u0E00-\u0E7F](?![0-9]))?/;
 
-        let allYearMatches = [];
-        for (let pat of yearPatterns) {
-          let m;
-          while ((m = pat.exec(str)) !== null) {
-            const rawText = m[0];
-            const trimmed = rawText.trim();
-            const startIdx = m.index + rawText.indexOf(trimmed);
-            if (!allYearMatches.some(item => Math.max(item.index, startIdx) < Math.min(item.index + item.length, startIdx + trimmed.length))) {
-              allYearMatches.push({ text: trimmed, index: startIdx, length: trimmed.length });
+        let currentCutter = '';
+        let cutterCount = 0;
+
+        const flushCutter = () => {
+          if (currentCutter) {
+            lines.push(currentCutter);
+            currentCutter = '';
+            cutterCount = 0;
+          }
+        };
+
+        let rest = str;
+        while (rest.length > 0) {
+          // ข้ามช่องว่างและเครื่องหมาย /
+          const sepMatch = rest.match(/^[\s\/]+/);
+          if (sepMatch) {
+            rest = rest.substring(sepMatch[0].length);
+            continue;
+          }
+
+          // ข้ามจุดนำหน้าเฉพาะกรณีที่ไม่ได้ตามด้วยเลขผู้แต่ง
+          if (rest.startsWith('.') && !cutterRegex.test(rest)) {
+            rest = rest.replace(/^\.+/, '');
+            continue;
+          }
+
+          // ก. ตรวจสอบ เดือน+ปี (เช่น Jan 2024 - Dec 2024, ม.ค. 2567)
+          let matchedDateRange = null;
+          for (const pat of dateRangePatterns) {
+            const m = rest.match(pat);
+            if (m) {
+              matchedDateRange = m[1];
+              rest = rest.substring(m[0].length);
+              break;
             }
           }
-        }
-
-        allYearMatches.sort((a, b) => a.index - b.index);
-
-        let pubYearMatch = null;
-        if (firstCutterIdx !== -1) {
-          pubYearMatch = allYearMatches.find(m => m.index >= firstCutterIdx);
-        } else if (allYearMatches.length > 0) {
-          pubYearMatch = allYearMatches[allYearMatches.length - 1];
-        }
-
-        let year = '', restBeforeYear = str, restAfterYear = '';
-        if (pubYearMatch) {
-          year = pubYearMatch.text;
-          restBeforeYear = str.substring(0, pubYearMatch.index).trim();
-          restAfterYear = str.substring(pubYearMatch.index + pubYearMatch.length).trim();
-        }
-
-        const monthPattern = new RegExp(`(?:${monthRegexStr}(?:\\s*[-–—]\\s*${monthRegexStr})?)`, 'i');
-        const yearHasMonth = year ? monthPattern.test(year) : false;
-        let monthStr = '';
-
-        // ค้นหาเดือนแยกต่างหากเฉพาะกรณีที่เดือนไม่ได้รวมอยู่ในบรรทัดปีพิมพ์แล้ว
-        if (!yearHasMonth) {
-          const monthMatchAfter = restAfterYear.match(monthPattern);
-          if (monthMatchAfter) {
-            monthStr = monthMatchAfter[0];
-            restAfterYear = (restAfterYear.substring(0, monthMatchAfter.index) + ' ' + restAfterYear.substring(monthMatchAfter.index + monthStr.length)).trim();
-          } else {
-            const monthMatchBefore = restBeforeYear.match(monthPattern);
-            if (monthMatchBefore) {
-              monthStr = monthMatchBefore[0];
-              restBeforeYear = (restBeforeYear.substring(0, monthMatchBefore.index) + ' ' + restBeforeYear.substring(monthMatchBefore.index + monthStr.length)).trim();
-            }
+          if (matchedDateRange) {
+            flushCutter();
+            lines.push('<span class="year-line">' + escapeHtml(matchedDateRange.trim()) + '</span>');
+            continue;
           }
-        }
 
-        let preCutterAndCutterStr = restBeforeYear;
-        let volPartLines = [];
-        let afterYearWords = [];
+          // ข. ตรวจสอบ ปีพิมพ์เดี่ยว (เช่น 2025, 2567, 2024a)
+          const yearMatch = rest.match(singleYearRegex);
+          if (yearMatch) {
+            flushCutter();
+            lines.push('<span class="year-line">' + escapeHtml(yearMatch[1].trim()) + '</span>');
+            rest = rest.substring(yearMatch[0].length);
+            continue;
+          }
 
-        if (restAfterYear) {
-          const volPartRegexGlobal = /(?:ล\.|เล่ม|v\.|V\.|c\.|C\.|bd\.|vol\.|Vol\.|ฉ\.|ต\.|ตอน|pt\.|Pt\.|part|Part|ค\.)\s*\d+[a-zA-Z\u0E00-\u0E7F]*/gi;
-          const volMatches = restAfterYear.match(volPartRegexGlobal) || [];
-          volPartLines = volMatches.map(v => v.trim());
+          // ค. ตรวจสอบ เดือนเดี่ยว (เช่น ม.ค., Jan-Mar)
+          const monthMatch = rest.match(monthOnlyRegex);
+          if (monthMatch) {
+            flushCutter();
+            lines.push(monthMatch[1].trim());
+            rest = rest.substring(monthMatch[0].length);
+            continue;
+          }
 
-          const leftoverAfterYear = restAfterYear.replace(volPartRegexGlobal, ' ').replace(/\s+/g, ' ').trim();
-          if (leftoverAfterYear) {
-            const cutterTokenCheck = /^\.?[A-Za-z\u0E00-\u0E7F]+\d+(?:[A-Za-z\u0E00-\u0E7F](?![0-9]))?$/;
-            const leftoverTokens = leftoverAfterYear.split(/\s+/).filter(Boolean);
-            const extraCutters = [];
-            for (const tok of leftoverTokens) {
-              if (cutterTokenCheck.test(tok)) {
-                extraCutters.push(tok);
+          // ง. ตรวจสอบ เลขเล่ม / ฉบับ / ตอน (เช่น ล.1, v.2, c.1)
+          const volMatch = rest.match(volPartRegex);
+          if (volMatch) {
+            flushCutter();
+            lines.push(volMatch[1].trim());
+            rest = rest.substring(volMatch[0].length);
+            continue;
+          }
+
+          // จ. ตรวจสอบ เลขผู้แต่ง / Cutter (จับคู่สูงสุด 2 ชุดต่อ 1 บรรทัดตามลำดับที่พบ)
+          const cutterMatch = rest.match(cutterRegex);
+          if (cutterMatch) {
+            const token = cutterMatch[0].replace(/^\./, '').trim();
+            if (token) {
+              if (!currentCutter) {
+                currentCutter = token;
+                cutterCount = 1;
+              } else if (cutterCount < 2) {
+                currentCutter += token;
+                cutterCount += 1;
               } else {
-                afterYearWords.push(tok.replace(/^\.+/, ''));
+                lines.push(currentCutter);
+                currentCutter = token;
+                cutterCount = 1;
               }
             }
-            if (extraCutters.length > 0) {
-              preCutterAndCutterStr = (preCutterAndCutterStr + ' ' + extraCutters.join(' ')).trim();
-            }
+            rest = rest.substring(cutterMatch[0].length);
+            continue;
+          }
+
+          // ฉ. คำหรือส่วนขยายอื่นๆ (คงไว้ตามตำแหน่งเดิม)
+          const wordMatch = rest.match(/^[^\s\/]+/);
+          if (wordMatch) {
+            flushCutter();
+            const word = wordMatch[0].replace(/^\.+/, '').trim();
+            if (word) lines.push(word);
+            rest = rest.substring(wordMatch[0].length);
           }
         }
 
-        if (!year && !monthStr && volPartLines.length === 0) {
-          const volPartRegexGlobal = /(?:ล\.|เล่ม|v\.|V\.|c\.|C\.|bd\.|vol\.|Vol\.|ฉ\.|ต\.|ตอน|pt\.|Pt\.|part|Part|ค\.)\s*\d+[a-zA-Z\u0E00-\u0E7F]*/gi;
-          const volPartMatch = preCutterAndCutterStr.match(/(?:\s+|^)((?:(?:ล\.|เล่ม|v\.|V\.|c\.|C\.|bd\.|vol\.|Vol\.|ฉ\.|ต\.|ตอน|pt\.|Pt\.|part|Part|ค\.)\s*\d+[a-zA-Z\u0E00-\u0E7F]*\s*)+)$/i);
-          if (volPartMatch) {
-            const fullVolStr = volPartMatch[1].trim();
-            const matches = fullVolStr.match(volPartRegexGlobal);
-            if (matches) {
-              volPartLines = matches.map(v => v.trim());
-              preCutterAndCutterStr = preCutterAndCutterStr.substring(0, volPartMatch.index).trim();
-            }
-          }
-        }
-
-        let preCutterStr = '';
-        let cutterStr = preCutterAndCutterStr;
-
-        const cutterInRestMatch = preCutterAndCutterStr.match(/(?:^|[\s\.\/])([A-Za-z\u0E00-\u0E7F]+\d+)/);
-        if (cutterInRestMatch) {
-          const matchStart = cutterInRestMatch.index + cutterInRestMatch[0].indexOf(cutterInRestMatch[1]);
-          preCutterStr = preCutterAndCutterStr.substring(0, matchStart).replace(/\.$/, '').trim();
-          cutterStr = preCutterAndCutterStr.substring(matchStart).trim();
-        } else {
-          preCutterStr = preCutterAndCutterStr;
-          cutterStr = '';
-        }
-
-        const preCutterLines = preCutterStr ? preCutterStr.split(/\s+/).filter(Boolean) : [];
-        const cutterLines = parseCutters(cutterStr);
-
-        if (prefixLine) lines.push(prefixLine);
-        if (ficPrefix) {
-          lines.push(ficPrefix);
-        } else {
-          if (classPrefix) lines.push(classPrefix);
-          if (classNum) lines.push(classNum);
-        }
-        lines.push(...preCutterLines);
-        lines.push(...cutterLines);
-        if (year) lines.push('<span class="year-line">' + escapeHtml(year) + '</span>');
-        if (monthStr) lines.push(monthStr);
-        lines.push(...afterYearWords.filter(Boolean));
-        lines.push(...volPartLines);
+        flushCutter();
       }
 
       lines = lines.map(line => line.includes('class="year-line"') ? line : escapeHtml(line.trim()));
@@ -2437,4 +2357,3 @@
   </script>
 </body>
 </html>
-```[cite: 1]
